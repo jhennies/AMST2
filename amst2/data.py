@@ -171,7 +171,7 @@ def snk_stack_to_ome_zarr():
                             '--cpus-per-task={threads} ' \
                             '--mem={resources.mem_mb} ' \
                             '--job-name=smk-{rule}-{wildcards} ' \
-                            '--output=logs/{rule}/{rule}-{wildcards}-%j.out'
+                            f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")}'
         # sn_args.default_resources = dict(
         #     partition='htc-el8',
         #     mem_mb=1000,
