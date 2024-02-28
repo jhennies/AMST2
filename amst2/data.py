@@ -147,7 +147,7 @@ def snk_stack_to_ome_zarr():
         sn_args.set_resources = dict(
             batch_to_ome_zarr=dict(
                 # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
+                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 16)),
                 time=10,
                 partition='htc-el8'
             )
@@ -169,12 +169,13 @@ def snk_stack_to_ome_zarr():
         jobscript_filepath = os.path.join(this_cache_dirpath, 'jobscript.sh')
         with open(jobscript_filepath, mode='w') as f:
             f.write(
-                f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && '
+                # f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && '
                 'sbatch '
                 '--partition={resources.partition} '
                 '--qos={resources.qos} '
                 '--cpus-per-task={threads} '
                 '--mem={resources.mem_mb} '
+                '--time={resources.time} '
                 '--job-name=smk-{rule}-{wildcards} '
                 f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")} '
                 '--account=mattei'
