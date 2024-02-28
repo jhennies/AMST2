@@ -97,6 +97,9 @@ def snk_stack_to_ome_zarr():
         os.mkdir(this_cache_dirpath)
     elif os.path.exists(this_cache_dirpath) and not continue_run:
         raise RuntimeError('Cache directory exists. If you want to continue use --continue_run')
+    log_dirpath = os.path.join(this_cache_dirpath, 'logs')
+    if not os.path.exists(log_dirpath):
+        os.mkdir(log_dirpath)
 
     from squirrel.library.io import load_data_handle
     data_h, shape_h = load_data_handle(stack_path, key=stack_key, pattern=stack_pattern)
