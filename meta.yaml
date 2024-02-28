@@ -1,0 +1,39 @@
+{% set name = "amst2" %}
+{% set version = "0.0.1" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  path: .
+
+requirements:
+  host:
+    - python
+    - numpy
+    - h5py
+    - tifffile
+  run:
+    - python
+    - numpy
+    - h5py
+    - tifffile
+
+test:
+  imports:
+    - squirrel
+    - squirrel.convert
+    - squirrel.io
+  commands:
+    - python -m unittest discover -s test
+
+about:
+  home: https://github.com/jhennies/amst2.git
+  license: GPLv3
+  license_family: GPL
+  summary: Alignment to median smoothed template workflow
+
+extra:
+  recipe-maintainers:
+    - jhennies

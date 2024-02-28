@@ -1,0 +1,40 @@
+
+import os
+import json
+
+print(os.getcwd())
+print(__file__)
+with open('run.json', mode='r') as f:
+    run_info = json.load(f)
+
+batch_ids = run_info['batch_ids']
+src_folder = run_info['src_folder']
+
+print(f'run_info = {run_info}')
+
+
+rule all:
+    input:
+        expand("stack_to_ome_zarr_{idx}.done", idx=batch_ids)
+
+
+rule batch_to_ome_zarr:
+    input:
+        run_info["ome_zarr_filepath"]
+    output:
+        "stack_to_ome_zarr_{idx}.done"
+    params:
+        run_info=run_info
+    script:
+        os.path.join(src_folder, "snakemake_call_scripts", "batch_to_ome_zarr.py")
+
+
+rule create_ome_zarr:
+    output:
+        directory(run_info["ome_zarr_filepath"])
+    params:
+        run_info=run_info
+    threads: 1
+    script:
+        os.path.join(src_folder, "snakemake_call_scripts","../snakemake_call_scripts/create_ome_zarr.py")
+
