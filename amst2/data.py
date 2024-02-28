@@ -145,8 +145,38 @@ def snk_stack_to_ome_zarr():
                 partition='htc-el8'
             )
         )
-        sn_args.workflow_profile = os.path.join(src_dirpath, 'cluster', cluster)
-        sn_args.executor = cluster
+
+        # sn_args.profile = 'cluster_slurm'  # os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml')
+        # sn_args.executor = cluster
+        # sn_args.resources = dict(
+        #     partition='htc-el8',
+        #
+        # )
+        # sn_args.configfile = Path(os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml'))
+        sn_args.jobscript = 'mkdir -p logs/{rule} && ' \
+                            'sbatch ' \
+                            '--partition={resources.partition} ' \
+                            '--qos={resources.qos} ' \
+                            '--cpus-per-task={threads} ' \
+                            '--mem={resources.mem_mb} ' \
+                            '--job-name=smk-{rule}-{wildcards} ' \
+                            '--output=logs/{rule}/{rule}-{wildcards}-%j.out'
+        sn_args.default_resources = dict(
+            partition='htc-el8',
+            mem_mb=1000,
+            time_min=10
+        )
+        sn_args.restart_times = 1
+        sn_args.max_jobs_per_second = 10
+        sn_args.max_status_checks_per_second = 1
+        sn_args.local_cores = 1
+        sn_args.latency_wait = 60
+        sn_args.jobs = 500
+        sn_args.keep_going = True
+        sn_args.rerun_incomplete = True
+        sn_args.printshellcmds = True
+        sn_args.scheduler = 'greedy'
+        sn_args.use_conda = True
     args_to_api(sn_args, parser)
 
 
