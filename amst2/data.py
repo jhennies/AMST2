@@ -158,7 +158,7 @@ def snk_stack_to_ome_zarr():
         #
         # )
         # sn_args.configfile = Path(os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml'))
-        sn_args.jobscript = f'mkdir -p {this_cache_dirpath}/logs/{rule} && ' \
+        sn_args.jobscript = f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && ' \
                             'sbatch ' \
                             '--partition={resources.partition} ' \
                             '--qos={resources.qos} ' \
