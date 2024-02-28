@@ -145,7 +145,7 @@ def snk_stack_to_ome_zarr():
                 partition='htc-el8'
             )
         )
-        sn_args.executor = cluster
+        sn_args.profile = cluster
     args_to_api(sn_args, parser)
 
 
