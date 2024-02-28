@@ -165,7 +165,8 @@ def snk_stack_to_ome_zarr():
         # )
         # sn_args.configfile = Path(os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml'))
 
-        with open('jobscript.sh', mode='w') as f:
+        jobscript_filepath = os.path.join(this_cache_dirpath, 'jobscript.sh')
+        with open(jobscript_filepath, mode='w') as f:
             f.write(
                 f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && '
                 'sbatch '
@@ -176,7 +177,7 @@ def snk_stack_to_ome_zarr():
                 '--job-name=smk-{rule}-{wildcards} '
                 f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")}'
             )
-        sn_args.jobscript = 'jobscript.sh'
+        sn_args.jobscript = jobscript_filepath
         # sn_args.jobscript = f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && ' \
         #                     'sbatch ' \
         #                     '--partition={resources.partition} ' \
