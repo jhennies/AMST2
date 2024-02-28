@@ -86,6 +86,7 @@ def snk_stack_to_ome_zarr():
 
     target_dirpath = os.path.abspath(target_dirpath)
     ome_zarr_filepath = os.path.abspath(ome_zarr_filepath)
+    stack_path = os.path.abspath(stack_path)
 
     if not os.path.exists(target_dirpath):
         os.mkdir(target_dirpath)
@@ -175,7 +176,8 @@ def snk_stack_to_ome_zarr():
                 '--cpus-per-task={threads} '
                 '--mem={resources.mem_mb} '
                 '--job-name=smk-{rule}-{wildcards} '
-                f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")}'
+                f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")} '
+                '--account=mattei'
             )
         sn_args.jobscript = jobscript_filepath
         # sn_args.jobscript = f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && ' \
