@@ -200,14 +200,14 @@ def snk_stack_to_ome_zarr():
         sn_args.max_jobs_per_second = 10
         sn_args.max_status_checks_per_second = 1
         sn_args.local_cores = 1
-        sn_args.latency_wait = 60
+        sn_args.latency_wait = 3
         sn_args.jobs = 500
         sn_args.keep_going = True
         sn_args.rerun_incomplete = True
         sn_args.printshellcmds = True
         sn_args.scheduler = 'greedy'
         sn_args.use_conda = True
-        # sn_args.verbose = True
+        sn_args.verbose = False
         sn_args.quiet = False
     args_to_api(sn_args, parser)
 
