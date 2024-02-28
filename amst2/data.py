@@ -84,6 +84,9 @@ def snk_stack_to_ome_zarr():
     if ome_zarr_filename is None:
         ome_zarr_filename = os.path.split(ome_zarr_filepath)[1]
 
+    target_dirpath = os.path.abspath(target_dirpath)
+    ome_zarr_filepath = os.path.abspath(ome_zarr_filepath)
+
     if not os.path.exists(target_dirpath):
         os.mkdir(target_dirpath)
     cache_dirpath = os.path.join(target_dirpath, 'snk_cache')
