@@ -143,6 +143,11 @@ def snk_stack_to_ome_zarr():
                 mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 1.1)),
                 time_min=10,
                 partition='htc-el8'
+            ),
+            default=dict(
+                partition='htc-el8',
+                mem_mb=1000,
+                time_min=10
             )
         )
 
@@ -161,11 +166,11 @@ def snk_stack_to_ome_zarr():
                             '--mem={resources.mem_mb} ' \
                             '--job-name=smk-{rule}-{wildcards} ' \
                             '--output=logs/{rule}/{rule}-{wildcards}-%j.out'
-        sn_args.default_resources = dict(
-            partition='htc-el8',
-            mem_mb=1000,
-            time_min=10
-        )
+        # sn_args.default_resources = dict(
+        #     partition='htc-el8',
+        #     mem_mb=1000,
+        #     time_min=10
+        # )
         sn_args.restart_times = 1
         sn_args.max_jobs_per_second = 10
         sn_args.max_status_checks_per_second = 1
