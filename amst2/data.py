@@ -145,7 +145,7 @@ def snk_stack_to_ome_zarr():
                 partition='htc-el8'
             )
         )
-        sn_args.profile = os.path.join(src_dirpath, 'cluster', cluster)
+        sn_args.workflow_profile = os.path.join(src_dirpath, 'cluster', cluster)
         sn_args.executor = cluster
     args_to_api(sn_args, parser)
 
