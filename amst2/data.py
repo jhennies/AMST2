@@ -147,8 +147,8 @@ def snk_stack_to_ome_zarr():
         sn_args.set_resources = dict(
             batch_to_ome_zarr=dict(
                 # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 1.1)),
-                time_min=10,
+                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 2)),
+                time=10,
                 partition='htc-el8'
             )
             # default=dict(
@@ -192,7 +192,7 @@ def snk_stack_to_ome_zarr():
         default_resources = DefaultResources()
         default_resources.set_resource('partition', 'htc-el8')
         default_resources.set_resource('mem_mb', 1000)
-        default_resources.set_resource('time_min', 10)
+        default_resources.set_resource('time', 10)
         sn_args.default_resources = default_resources
         # sn_args.default_resources = dict(
         #     partition='htc-el8',
