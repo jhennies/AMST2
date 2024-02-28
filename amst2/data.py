@@ -152,7 +152,7 @@ def snk_stack_to_ome_zarr():
         )
 
         # sn_args.profile = 'cluster_slurm'  # os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml')
-        # sn_args.executor = cluster
+        sn_args.executor = cluster
         # sn_args.resources = dict(
         #     partition='htc-el8',
         #
