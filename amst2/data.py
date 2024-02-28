@@ -186,11 +186,17 @@ def snk_stack_to_ome_zarr():
         #                     '--mem={resources.mem_mb} ' \
         #                     '--job-name=smk-{rule}-{wildcards} ' \
         #                     f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")}'
-        sn_args.default_resources = dict(
-            partition='htc-el8',
-            mem_mb=1000,
-            time_min=10
-        )
+        from snakemake.resources import DefaultResources
+        default_resources = DefaultResources()
+        default_resources.set_resource('partition', 'htc-el8')
+        default_resources.set_resource('mem_mb', 1000)
+        default_resources.set_resource('time_min', 10)
+        sn_args.default_resources = default_resources
+        # sn_args.default_resources = dict(
+        #     partition='htc-el8',
+        #     mem_mb=1000,
+        #     time_min=10
+        # )
         sn_args.restart_times = 1
         sn_args.max_jobs_per_second = 10
         sn_args.max_status_checks_per_second = 1
