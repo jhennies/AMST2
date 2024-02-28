@@ -160,36 +160,29 @@ def snk_stack_to_ome_zarr():
 
         # sn_args.profile = 'cluster_slurm'  # os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml')
         sn_args.executor = cluster
+        sn_args.configfile = os.path.join(src_dirpath, 'amst2', 'cluster', 'slurm', 'config.yaml')
         # sn_args.resources = dict(
         #     partition='htc-el8',
         #
         # )
         # sn_args.configfile = Path(os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml'))
 
-        jobscript_filepath = os.path.join(this_cache_dirpath, 'jobscript.sh')
-        with open(jobscript_filepath, mode='w') as f:
-            f.write(
-                # f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && '
-                'sbatch '
-                '--partition={resources.partition} '
-                '--qos={resources.qos} '
-                '--cpus-per-task={threads} '
-                '--mem={resources.mem_mb} '
-                '--time={resources.time} '
-                '--job-name=smk-{rule}-{wildcards} '
-                f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")} '
-                f'--error={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.err")}'
-                '--account=mattei'
-            )
-        sn_args.jobscript = jobscript_filepath
-        # sn_args.jobscript = f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && ' \
-        #                     'sbatch ' \
-        #                     '--partition={resources.partition} ' \
-        #                     '--qos={resources.qos} ' \
-        #                     '--cpus-per-task={threads} ' \
-        #                     '--mem={resources.mem_mb} ' \
-        #                     '--job-name=smk-{rule}-{wildcards} ' \
-        #                     f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")}'
+        # jobscript_filepath = os.path.join(this_cache_dirpath, 'jobscript.sh')
+        # with open(jobscript_filepath, mode='w') as f:
+        #     f.write(
+        #         # f'mkdir -p {os.path.join(this_cache_dirpath, "logs", "{rule}")} && '
+        #         'sbatch '
+        #         '--partition={resources.partition} '
+        #         '--qos={resources.qos} '
+        #         '--cpus-per-task={threads} '
+        #         '--mem={resources.mem_mb} '
+        #         '--time={resources.time} '
+        #         '--job-name=smk-{rule}-{wildcards} '
+        #         f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")} '
+        #         f'--error={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.err")}'
+        #         '--account=mattei'
+        #     )
+        # sn_args.jobscript = jobscript_filepath
         from snakemake.resources import DefaultResources
         default_resources = DefaultResources()
         default_resources.set_resource('partition', 'htc-el8')
