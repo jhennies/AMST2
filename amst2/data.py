@@ -212,6 +212,7 @@ def snk_stack_to_ome_zarr():
         sn_args.printshellcmds = True
         sn_args.scheduler = 'greedy'
         sn_args.use_conda = True
+        sn_args.verbose = True
     args_to_api(sn_args, parser)
 
 
