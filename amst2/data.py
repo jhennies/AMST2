@@ -178,6 +178,7 @@ def snk_stack_to_ome_zarr():
                 '--time={resources.time} '
                 '--job-name=smk-{rule}-{wildcards} '
                 f'--output={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.out")} '
+                f'--error={os.path.join(log_dirpath, "{rule}-{wildcards}-%j.err")}'
                 '--account=mattei'
             )
         sn_args.jobscript = jobscript_filepath
