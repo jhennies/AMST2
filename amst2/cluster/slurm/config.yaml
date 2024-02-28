@@ -1,4 +1,4 @@
-cluster:
+jobscript:
   mkdir -p logs/{rule} &&
   sbatch
     --partition={resources.partition}
@@ -8,7 +8,7 @@ cluster:
     --time={resources.time}
     --job-name=smk-{rule}-{wildcards}
     --output=logs/{rule}/{rule}-{wildcards}-%j.out
-    --account=mattei
+    --account=schwab
 default-resources:
   - partition=htc-el8
   - mem_mb=1000

@@ -147,8 +147,8 @@ def snk_stack_to_ome_zarr():
         sn_args.set_resources = dict(
             batch_to_ome_zarr=dict(
                 # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 16)),
-                time=10,
+                mem_mb=8000,  #int(np.ceil(estimate_mem_mb(data_h) * batch_size * 32)),
+                runtime=20,
                 partition='htc-el8'
             )
             # default=dict(
@@ -160,7 +160,7 @@ def snk_stack_to_ome_zarr():
 
         # sn_args.profile = 'cluster_slurm'  # os.path.join(src_dirpath, 'cluster', cluster, 'config.yaml')
         sn_args.executor = cluster
-        sn_args.configfile = os.path.join(src_dirpath, 'amst2', 'cluster', 'slurm', 'config.yaml')
+        # sn_args.configfile = [Path(os.path.join(src_dirpath, 'cluster', 'slurm', 'config.yaml'))]
         # sn_args.resources = dict(
         #     partition='htc-el8',
         #
@@ -187,7 +187,9 @@ def snk_stack_to_ome_zarr():
         default_resources = DefaultResources()
         default_resources.set_resource('partition', 'htc-el8')
         default_resources.set_resource('mem_mb', 1000)
-        default_resources.set_resource('time', 10)
+        default_resources.set_resource('runtime', 10)
+        default_resources.set_resource('slurm_account', 'mattei')
+        default_resources.set_resource('name', '{rule}-{wildcards}')
         sn_args.default_resources = default_resources
         # sn_args.default_resources = dict(
         #     partition='htc-el8',
@@ -205,7 +207,8 @@ def snk_stack_to_ome_zarr():
         sn_args.printshellcmds = True
         sn_args.scheduler = 'greedy'
         sn_args.use_conda = True
-        sn_args.verbose = True
+        # sn_args.verbose = True
+        sn_args.quiet = False
     args_to_api(sn_args, parser)
 
 
