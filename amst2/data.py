@@ -1,5 +1,6 @@
 
 import os
+import numpy as np
 
 
 def snk_stack_to_ome_zarr():
@@ -44,6 +45,8 @@ def snk_stack_to_ome_zarr():
                         help='Number of slices forming one batch; default=16')
     parser.add_argument('--continue_run', action='store_true',
                         help='Needed to continue a run')
+    parser.add_argument('--cluster', type=str, default=None,
+                        help='Use "--cluster slurm" to run on a slurm cluster (only tested on EMBL resources)')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
@@ -63,10 +66,12 @@ def snk_stack_to_ome_zarr():
     cores = args.cores
     batch_size = args.batch_size
     continue_run = args.continue_run
+    cluster = args.cluster
     verbose = args.verbose
 
     # import time
     import json
+    from amst2.library.data import estimate_mem_mb
 
     if ome_zarr_filepath is None:
         if ome_zarr_filename is not None:
@@ -131,6 +136,16 @@ def snk_stack_to_ome_zarr():
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/stack_to_ome_zarr.snk'))
     sn_args.cores = cores
     sn_args.set_threads = dict(batch_to_ome_zarr=min(batch_size, cores))
+    if cluster is not None:
+        sn_args.set_resources = dict(
+            batch_to_ome_zarr=dict(
+                # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
+                mem_mb=int(np.ceil(estimate_mem_mb(data_h) * batch_size * 1.1)),
+                time_min=10,
+                partition='htc-el8'
+            )
+        )
+        sn_args.executor = cluster
     args_to_api(sn_args, parser)
 
 
