@@ -8,7 +8,7 @@ with open('run.json', mode='r') as f:
     run_info = json.load(f)
 
 batch_ids = run_info['batch_ids']
-src_folder = run_info['src_folder']
+src_dirpath = run_info['src_dirpath']
 
 print(f'run_info = {run_info}')
 
@@ -26,7 +26,7 @@ rule batch_to_ome_zarr:
     params:
         run_info=run_info
     script:
-        os.path.join(src_folder, "snakemake_call_scripts", "batch_to_ome_zarr.py")
+        os.path.join(src_dirpath, "snakemake_call_scripts", "batch_to_ome_zarr.py")
 
 
 rule create_ome_zarr:
@@ -36,5 +36,5 @@ rule create_ome_zarr:
         run_info=run_info
     threads: 1
     script:
-        os.path.join(src_folder, "snakemake_call_scripts","../snakemake_call_scripts/create_ome_zarr.py")
+        os.path.join(src_dirpath, "snakemake_call_scripts","../snakemake_call_scripts/create_ome_zarr.py")
 

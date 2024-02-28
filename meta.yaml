@@ -22,9 +22,7 @@ requirements:
 
 test:
   imports:
-    - squirrel
-    - squirrel.convert
-    - squirrel.io
+    - AMST2
   commands:
     - python -m unittest discover -s test
 

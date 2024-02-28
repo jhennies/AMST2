@@ -1,7 +1,7 @@
 import runpy
 from setuptools import setup
 
-version = runpy.run_path("squirrel/__version__.py")["__version__"]
+version = runpy.run_path("amst2/__version__.py")["__version__"]
 
 setup(
     name='amst2',
@@ -13,7 +13,7 @@ setup(
     packages=['amst2'],
     entry_points={
         'console_scripts': [
-            'apply_stack_alignment = squirrel.apply_transformation:apply_stack_alignment'
+            'snk_stack_to_ome_zarr = amst2.data:snk_stack_to_ome_zarr'
         ]
     },
     install_requires=[

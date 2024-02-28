@@ -24,7 +24,7 @@ def snk_stack_to_ome_zarr():
                         help='File pattern for globbing the input stack; default="*.tif"')
     parser.add_argument('--stack_key', type=str, default='data',
                         help='Path within input h5 file; default="data"')
-    parser.add_argument('--resolution', type=float, default=(1., 1., 1.),
+    parser.add_argument('--resolution', type=float, nargs=3, default=(1., 1., 1.),
                         help='Resolution of input data; default=(1., 1., 1.)')
     parser.add_argument('--unit', type=str, default='pixel',
                         help='Unit of input resolution; default="pixel"')
@@ -68,17 +68,6 @@ def snk_stack_to_ome_zarr():
     # import time
     import json
 
-    if not os.path.exists(target_dirpath):
-        os.mkdir(target_dirpath)
-    cache_dirpath = os.path.join(target_dirpath, 'snk_cache')
-    if not os.path.exists(cache_dirpath):
-        os.mkdir(cache_dirpath)
-    this_cache_dirpath = os.path.join(cache_dirpath, f'stack_to_ome_zarr')  # _{time.time()}')
-    if not os.path.exists(this_cache_dirpath):
-        os.mkdir(this_cache_dirpath)
-    elif os.path.exists(this_cache_dirpath) and not continue_run:
-        raise RuntimeError('Cache directory exists. If you want to continue use --continue_run')
-
     if ome_zarr_filepath is None:
         if ome_zarr_filename is not None:
             ome_zarr_filepath = os.path.join(target_dirpath, ome_zarr_filename)
@@ -87,10 +76,25 @@ def snk_stack_to_ome_zarr():
                 target_dirpath,
                 os.path.split(stack_path)[1].replace('.h5', '') + '.ome.zarr'
             )
+    if ome_zarr_filename is None:
+        ome_zarr_filename = os.path.split(ome_zarr_filepath)[1]
+
+    if not os.path.exists(target_dirpath):
+        os.mkdir(target_dirpath)
+    cache_dirpath = os.path.join(target_dirpath, 'snk_cache')
+    if not os.path.exists(cache_dirpath):
+        os.mkdir(cache_dirpath)
+    this_cache_dirpath = os.path.join(cache_dirpath, f'stack_to_ome_zarr_{ome_zarr_filename.replace(".ome.zarr", "")}')
+    if not os.path.exists(this_cache_dirpath):
+        os.mkdir(this_cache_dirpath)
+    elif os.path.exists(this_cache_dirpath) and not continue_run:
+        raise RuntimeError('Cache directory exists. If you want to continue use --continue_run')
 
     from squirrel.library.io import load_data_handle
     data_h, shape_h = load_data_handle(stack_path, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], batch_size)]
+
+    src_dirpath = os.path.dirname(os.path.realpath(__file__))
 
     run_info = dict(
         stack_path=stack_path,
@@ -112,7 +116,7 @@ def snk_stack_to_ome_zarr():
         batch_ids=batch_ids,
         stack_shape=shape_h,
         continue_run=continue_run,
-        src_folder=os.getcwd()  # FIXME I don't think this is correct
+        src_dirpath=src_dirpath
     )
 
     with open(os.path.join(this_cache_dirpath, 'run.json'), mode='w') as f:
@@ -124,7 +128,7 @@ def snk_stack_to_ome_zarr():
     sn_args.dryrun = False
     sn_args.unlock = False
     sn_args.directory = Path(this_cache_dirpath)
-    sn_args.snakefile = Path('snakemake_workflows/stack_to_ome_zarr.snk')
+    sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/stack_to_ome_zarr.snk'))
     sn_args.cores = cores
     sn_args.set_threads = dict(batch_to_ome_zarr=min(batch_size, cores))
     args_to_api(sn_args, parser)
