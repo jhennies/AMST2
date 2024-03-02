@@ -25,8 +25,6 @@ rule batch_to_ome_zarr:
         "stack_to_ome_zarr_{idx}.done"
     params:
         run_info=run_info
-    resources:
-        time_min=5
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "batch_to_ome_zarr.py")
 
