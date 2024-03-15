@@ -18,7 +18,7 @@ if __name__ == '__main__':
     )[0].dtype
 
     create_ome_zarr(
-        run_info['ome_zarr_filepath'],
+        run_info['output_ome_zarr_filepath'],
         shape=run_info['stack_shape'],
         resolution=run_info['resolution'],
         unit=run_info['unit'],

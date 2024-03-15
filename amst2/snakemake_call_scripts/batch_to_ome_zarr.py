@@ -16,7 +16,7 @@ if __name__ == '__main__':
     from squirrel.workflows.convert import stack_to_ome_zarr_workflow
     stack_to_ome_zarr_workflow(
         run_info['stack_path'],
-        run_info['ome_zarr_filepath'],
+        run_info['output_ome_zarr_filepath'],
         stack_pattern=run_info['stack_pattern'],
         stack_key=run_info['stack_key'],
         resolution=run_info['resolution'],

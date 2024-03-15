@@ -23,6 +23,43 @@ def common_args_to_dict(args):
     )
 
 
+def add_output_locations_to_parser(parser):
+
+    parser.add_argument('target_dirpath', type=str,
+                        help='Output director which will contain the cache directory and, by default, also the '
+                             'ome.zarr output')
+    parser.add_argument('-out-oz-fn', '--output_ome_zarr_filename', type=str, default=None,
+                        help='Filename of the ome.zarr output')
+    parser.add_argument('-out-oz-fp', '--output_ome_zarr_filepath', type=str, default=None,
+                        help='Full filepath for the ome.zarr output. Over-writes --ome_zarr_filename')
+
+
+def output_locations_to_dict(args, workflow_name='wf', fallback_output_name='output'):
+
+    from amst2.library.input_file_and_dirpaths import make_cache_folder_structure, solve_output_path_and_name
+
+    output_ome_zarr_filepath, output_ome_zarr_filename = solve_output_path_and_name(
+        args.output_ome_zarr_filepath,
+        args.output_ome_zarr_filename,
+        args.target_dirpath,
+        fallback_output_name
+    )
+
+    cache_dirpath, this_cache_dirpath = make_cache_folder_structure(
+        args.target_dirpath,
+        f'{workflow_name}_{output_ome_zarr_filename.replace(".ome.zarr", "")}',
+        continue_run=args.continue_run
+    )
+
+    return dict(
+        target_dirpath=args.target_dirpath,
+        output_ome_zarr_filename=output_ome_zarr_filename,
+        output_ome_zarr_filepath=output_ome_zarr_filepath,
+        cache_dirpath=cache_dirpath,
+        this_cache_dirpath=this_cache_dirpath
+    )
+
+
 def add_ome_zarr_arguments_to_parser(parser):
 
     parser.add_argument('--resolution', type=float, nargs=3, default=(1., 1., 1.),
@@ -57,11 +94,24 @@ def add_snakemake_arguments_to_parser(parser):
                         help='Snakemake argument')
     parser.add_argument('--unlock', action='store_true',
                         help='Snakemake argument')
+    parser.add_argument('--rerun_triggers', type=str, nargs='+', default=[],
+                        help='Snakemake argument; use "--rerun_triggers mtime" to avoid rerunning due to changed params')
 
 
-def args_to_snakemake_arguments(args, sn_args):
+def args_to_snakemake_arguments(args, sn_args, output_location_args=None):
 
     sn_args.dryrun = args.dryrun
     sn_args.unlock = args.unlock
     sn_args.cores = args.cores
+    sn_args.rerun_triggers = args.rerun_triggers
+    if output_location_args is not None:
+        from pathlib import Path
+        sn_args.directory = Path(output_location_args['this_cache_dirpath'])
+
+
+def write_run_json(run_info, output_location_args):
+    import json
+    import os
+    with open(os.path.join(output_location_args['this_cache_dirpath'], 'run.json'), mode='w') as f:
+        json.dump(run_info, f, indent=2)
 

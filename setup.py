@@ -13,7 +13,7 @@ setup(
     packages=['amst2'],
     entry_points={
         'console_scripts': [
-            'snk_stack_to_ome_zarr = amst2.data:snk_stack_to_ome_zarr'
+            'snk_stack_to_ome_zarr = amst2.conversion:snk_stack_to_ome_zarr'
         ]
     },
     install_requires=[

@@ -20,7 +20,7 @@ rule all:
 
 rule batch_to_ome_zarr:
     input:
-        run_info["ome_zarr_filepath"]
+        run_info["output_ome_zarr_filepath"]
     output:
         "stack_to_ome_zarr_{idx}.done"
     params:
@@ -31,10 +31,10 @@ rule batch_to_ome_zarr:
 
 rule create_ome_zarr:
     output:
-        directory(run_info["ome_zarr_filepath"])
+        directory(run_info["output_ome_zarr_filepath"])
     params:
         run_info=run_info
     threads: 1
     script:
-        os.path.join(src_dirpath, "snakemake_call_scripts","../snakemake_call_scripts/create_ome_zarr.py")
+        os.path.join(src_dirpath, "snakemake_call_scripts", "create_ome_zarr.py")
 
