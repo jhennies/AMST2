@@ -27,7 +27,12 @@ def snk_default_amst_pre_alignment():
                         help='Use this flag to turn off the local (slice-to-slice) alignment')
     parser.add_argument('--template_roi', type=float, nargs=5, default=None,
                         metavar=('x-min', 'x-max', 'y-min', 'y-max', 'z'),
-                        help='If supplied template matching will be perfomed with the here defined template')
+                        help='If supplied template matching will be performed with the here defined template\n'
+                             'Note: the values for x, y and z are in dataset units!')
+    parser.add_argument('--tm_search_roi', type=float, nargs=4, default=None,
+                        metavar=('x-min', 'x-max', 'y-min', 'y-max'),
+                        help='The template will only be matched in this area.\n'
+                             'Note: the values for x, y and z are in dataset units!')
     parser.add_argument('-cm', '--combine_median', type=int, default=8,
                         help='Median smoothing of offsets when combining local and TM')
     parser.add_argument('-cs', '--combine_sigma', type=float, default=8.,
@@ -48,6 +53,7 @@ def snk_default_amst_pre_alignment():
     combine_median = args.combine_median
     combine_sigma = args.combine_sigma
     no_previews = args.no_previews
+    tm_search_roi = args.tm_search_roi
 
     common_args = common_args_to_dict(args)
     output_location_args = output_locations_to_dict(
@@ -67,7 +73,7 @@ def snk_default_amst_pre_alignment():
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
         no_local_alignment=no_local_alignment,
-        template_roi=template_roi,
+        use_template_matching=template_roi is not None,
         combine_median=combine_median,
         combine_sigma=combine_sigma,
         no_previews=no_previews,
@@ -79,6 +85,10 @@ def snk_default_amst_pre_alignment():
             auto_mask=local_auto_mask,
             transform='translation',
             key='s0'
+        ),
+        template_matching_params=dict(
+            template_roi=template_roi,
+            search_roi=tm_search_roi
         ),
         **output_location_args,
         **common_args,

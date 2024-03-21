@@ -13,7 +13,7 @@ if __name__ == '__main__':
     from squirrel.library.io import load_data_handle, load_data_from_handle_stack
 
     dtype = load_data_from_handle_stack(
-        load_data_handle(run_info['stack_path'], run_info['stack_key'], run_info['stack_pattern']),
+        load_data_handle(run_info['stack_path'], run_info['stack_key'], run_info['stack_pattern'])[0],
         0
     )[0].dtype
 
