@@ -1,5 +1,6 @@
 
 import os
+import numpy as np
 
 
 def snk_default_amst_pre_alignment():
@@ -26,11 +27,11 @@ def snk_default_amst_pre_alignment():
     parser.add_argument('--no_local_alignment', action='store_true',
                         help='Use this flag to turn off the local (slice-to-slice) alignment')
     parser.add_argument('--template_roi', type=float, nargs=5, default=None,
-                        metavar=('x-min', 'x-max', 'y-min', 'y-max', 'z'),
+                        metavar=('x-min', 'y-min', 'x-max', 'y-max', 'z'),
                         help='If supplied template matching will be performed with the here defined template\n'
                              'Note: the values for x, y and z are in dataset units!')
     parser.add_argument('--tm_search_roi', type=float, nargs=4, default=None,
-                        metavar=('x-min', 'x-max', 'y-min', 'y-max'),
+                        metavar=('x-min', 'y-min', 'x-max', 'y-max'),
                         help='The template will only be matched in this area.\n'
                              'Note: the values for x, y and z are in dataset units!')
     parser.add_argument('-cm', '--combine_median', type=int, default=8,
@@ -68,8 +69,23 @@ def snk_default_amst_pre_alignment():
     # Generate run.json ----------------------------------
 
     from squirrel.library.io import load_data_handle
+    from squirrel.library.data import resolution_to_pixels
+    from squirrel.library.ome_zarr import get_scale_of_downsample_level, get_ome_zarr_handle
     data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
     batch_ids = [x for x in range(0, shape_h[0], args.batch_size)]
+    ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
+    resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
+    if template_roi is not None:
+        template_roi = np.array(template_roi)
+        template_roi[[0, 2]] = resolution_to_pixels(template_roi[[0, 2]], resolution[2])
+        template_roi[[1, 3]] = resolution_to_pixels(template_roi[[1, 3]], resolution[1])
+        template_roi[4] = resolution_to_pixels(template_roi[4], resolution[0])
+        template_roi = template_roi.tolist()
+    if tm_search_roi is not None:
+        tm_search_roi = np.array(tm_search_roi)
+        tm_search_roi[[0, 2]] = resolution_to_pixels(tm_search_roi[[0, 2]], resolution[2])
+        tm_search_roi[[1, 3]] = resolution_to_pixels(tm_search_roi[[1, 3]], resolution[1])
+        tm_search_roi = tm_search_roi.tolist()
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
 
@@ -92,7 +108,9 @@ def snk_default_amst_pre_alignment():
         ),
         template_matching_params=dict(
             template_roi=template_roi,
-            search_roi=tm_search_roi
+            search_roi=tm_search_roi,
+            key='s0',
+            save_template=True
         ),
         **output_location_args,
         **common_args,

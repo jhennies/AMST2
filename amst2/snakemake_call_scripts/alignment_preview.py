@@ -16,14 +16,9 @@ if __name__ == '__main__':
     # Collect the transformations
     import json
     import numpy as np
-    from squirrel.library.transformation import load_transform_matrices
-    transforms = []
-    for transform_filepath in input:
-        transforms.extend(
-            np.array(load_transform_matrices(transform_filepath, validate=True, ndim=2))
-        )
-        # with open(transform_filepath, mode='r') as f:
-        #     transforms.extend(json.load(f))
+    from squirrel.library.transformation import load_transform_matrices_from_multiple_files
+
+    transforms, sequenced = load_transform_matrices_from_multiple_files(input, validate=True, ndim=2)
 
     # Downsample the transformations
     from squirrel.library.transformation import scale_sequential_affines, serialize_affine_sequence
@@ -37,7 +32,8 @@ if __name__ == '__main__':
     scale = 1 / scale[0]
     if verbose:
         print(f'scale = {scale}')
-    transforms = serialize_affine_sequence(transforms, param_order='M', out_param_order='M', verbose=verbose)
+    if not sequenced:
+        transforms = serialize_affine_sequence(transforms, param_order='M', out_param_order='M', verbose=verbose)
     transforms = scale_sequential_affines(transforms, scale, xy_pivot=(0., 0.))
 
     # Serialize and apply the transformations

@@ -63,7 +63,7 @@ rule template_matching_preview:
     input:
         expand(os.path.join(this_cache_dirpath,"template_matching_{idx}.json"),idx=batch_ids)
     output:
-        directory(os.path.join(this_cache_dirpath, "template_matching_preview.h5"))
+        os.path.join(this_cache_dirpath, "template_matching_preview.h5")
     params:
         run_info=run_info
     script:
@@ -75,7 +75,7 @@ rule template_matching:
         os.path.join(this_cache_dirpath, "template_matching_{idx}.json")
     params:
         run_info=run_info,
-        template_matching_workflow_params=run_info['template_matching_params']
+        template_matching_stack_alignment_workflow_params=run_info['template_matching_params']
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "template_matching_stack_alignment.py")
 

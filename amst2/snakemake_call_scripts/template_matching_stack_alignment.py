@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     print(f'z_range = {z_range}')
 
-    from squirrel.workflows.elastix import template_matching_stack_alignment_workflow
+    from squirrel.workflows.template_matching import template_matching_stack_alignment_workflow
 
     template_matching_stack_alignment_workflow(
         run_info['input_ome_zarr_filepath'],
