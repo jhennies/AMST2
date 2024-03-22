@@ -39,6 +39,8 @@ def snk_default_amst_pre_alignment():
                         help='Gaussian smoothing of offsets when combining local and TM')
     parser.add_argument('--no_previews', action='store_true',
                         help='No preview outputs are generated for the alignement steps')
+    parser.add_argument('--preview_downsample_level', type=int, default=2,
+                        help='Downsample level of preview volumes; default=2')
 
     add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
@@ -54,6 +56,7 @@ def snk_default_amst_pre_alignment():
     combine_sigma = args.combine_sigma
     no_previews = args.no_previews
     tm_search_roi = args.tm_search_roi
+    preview_downsample_level = args.preview_downsample_level
 
     common_args = common_args_to_dict(args)
     output_location_args = output_locations_to_dict(
@@ -80,11 +83,12 @@ def snk_default_amst_pre_alignment():
         batch_ids=batch_ids,
         stack_shape=shape_h,
         src_dirpath=src_dirpath,
-        preview_downsample_level=2,  # This could be a parameter
+        preview_downsample_level=preview_downsample_level,
         local_alignment_params=dict(
             auto_mask=local_auto_mask,
             transform='translation',
-            key='s0'
+            key='s0',
+            pre_fix_big_jumps=True  # Hard-coding because if slices are off it really doesn't work otherwise!
         ),
         template_matching_params=dict(
             template_roi=template_roi,
