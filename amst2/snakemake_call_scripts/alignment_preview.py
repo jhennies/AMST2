@@ -14,7 +14,6 @@ if __name__ == '__main__':
         print(f'output = {output}')
 
     # Collect the transformations
-    import json
     import numpy as np
     from squirrel.library.transformation import load_transform_matrices_from_multiple_files
 
