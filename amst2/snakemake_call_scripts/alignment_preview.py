@@ -15,12 +15,11 @@ if __name__ == '__main__':
 
     # Collect the transformations
     import numpy as np
-    from squirrel.library.transformation import load_transform_matrices_from_multiple_files
 
-    transforms, sequenced = load_transform_matrices_from_multiple_files(input, validate=True, ndim=2)
+    from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
+    transforms = load_affine_stack_from_multiple_files(input)
 
     # Downsample the transformations
-    from squirrel.library.transformation import scale_sequential_affines, serialize_affine_sequence
     from squirrel.library.ome_zarr import get_ome_zarr_handle, get_scale_of_downsample_level
 
     input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
@@ -31,9 +30,9 @@ if __name__ == '__main__':
     scale = 1 / scale[0]
     if verbose:
         print(f'scale = {scale}')
-    if not sequenced:
-        transforms = serialize_affine_sequence(transforms, param_order='M', out_param_order='M', verbose=verbose)
-    transforms = scale_sequential_affines(transforms, scale, xy_pivot=(0., 0.))
+    if not transforms.is_sequenced:
+        transforms = transforms.get_sequenced_stack()
+    transforms = transforms.get_scaled(scale)
 
     # Serialize and apply the transformations
     from squirrel.library.transformation import apply_stack_alignment
@@ -43,8 +42,6 @@ if __name__ == '__main__':
         input_ome_zarr_dataseth.shape,
         transforms,
         no_adding_of_transforms=True,
-        xy_pivot=(0., 0.),
-        param_order='M',
         verbose=verbose
     )
 
