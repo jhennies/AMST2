@@ -3,6 +3,8 @@ def add_common_arguments_to_parser(parser):
 
     parser.add_argument('--cores', type=int, default=1,
                         help='Maximum number of available cores')
+    parser.add_argument('--max_cores_per_task', type=int, default=16,
+                        help='Maximum number of cores available to one task')
     parser.add_argument('--batch_size', type=int, default=16,
                         help='Number of slices forming one batch; default=16')
     parser.add_argument('--continue_run', action='store_true',
@@ -16,6 +18,7 @@ def common_args_to_dict(args):
 
     return dict(
         cores=args.cores,
+        max_cores_per_task=args.max_cores_per_task,
         batch_size=args.batch_size,
         continue_run=args.continue_run,
         cluster=args.cluster,

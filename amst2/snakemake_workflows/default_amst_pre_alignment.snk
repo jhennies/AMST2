@@ -42,6 +42,7 @@ rule apply_final_transformations:
         os.path.join(this_cache_dirpath, "apply_final_transformations_{idx}.done")
     params:
         run_info=run_info
+    threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "apply_transformation.py")
 
@@ -80,6 +81,7 @@ rule final_preview:
         os.path.join(preview_dirpath, "final_preview.h5")
     params:
         run_info=run_info
+    threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "alignment_preview.py")
 
@@ -102,6 +104,7 @@ rule finalize_and_join_transformations:
         run_info=run_info,
         use_tm=use_tm,
         use_local=use_local
+    threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "finalize_and_join_transformations.py")
 
@@ -113,6 +116,7 @@ rule template_matching_preview:
         os.path.join(preview_dirpath, "template_matching_preview.h5")
     params:
         run_info=run_info
+    threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "alignment_preview.py")
 
@@ -124,6 +128,7 @@ rule template_matching:
         run_info=run_info,
         template_matching_stack_alignment_workflow_params=run_info['template_matching_params'],
         determine_bounds=True
+    threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "template_matching_stack_alignment.py")
 
@@ -135,6 +140,7 @@ rule local_alignment_preview:
         os.path.join(preview_dirpath, "local_preview.h5")
     params:
         run_info=run_info
+    threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "alignment_preview.py")
 
@@ -146,6 +152,7 @@ rule elastix_stack_alignment:
         run_info=run_info,
         elastix_stack_alignment_workflow_params=run_info['local_alignment_params'],
         determine_bounds=not use_tm
+    threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "elastix_stack_alignment.py")
 
