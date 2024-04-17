@@ -33,16 +33,6 @@ rule all:
         _rule_all_inputs
 
 
-# TODO:
-#  - Make this one script call (parallelize internally)
-#  - Creates ome.zarr
-#  - For each batch: compute result and save to ome.zarr
-#  Don't do this:
-#  - Use squirrel.workflows.transformation.apply_stack_alignment_on_volume_workflow
-#  - Adjust function above to return result (instead of writing to file)
-#  Do this instead:
-#  - Auto-pad info is determined earlier (see below)
-#  - Use squirrel.library.transformation.apply_stack_alignment
 rule apply_final_transformations:
     input:
         run_info["output_ome_zarr_filepath"],
@@ -102,10 +92,6 @@ def _rule_finalize_and_join_transformations_inputs(wildcards):
     return inputs
 
 
-# TODO: Determine the auto-pad information here!
-#  - <ignored> Either: Each data slice needs to be loaded here
-#  - <done> Or: The bounds of each data slice need to be determined earlier (at TM or local alignment)
-#  - <done> The resulting info could be stored in the output json as well
 rule finalize_and_join_transformations:
     input:
         _rule_finalize_and_join_transformations_inputs

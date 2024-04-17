@@ -1,6 +1,5 @@
 
 import os
-import numpy as np
 
 
 def snk_default_amst_pre_alignment():
