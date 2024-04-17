@@ -37,9 +37,14 @@ if __name__ == '__main__':
     # Serialize and apply the transformations
     from squirrel.library.transformation import apply_stack_alignment
     input_ome_zarr_dataseth = input_ome_zarr_fileh[f's{preview_downsample_level}']
+
+    stack_shape = input_ome_zarr_dataseth.shape
+    if transforms.exists_meta('stack_shape'):
+        stack_shape = np.array(transforms.get_meta('stack_shape')) * scale
+
     result_stack = apply_stack_alignment(
         input_ome_zarr_dataseth,
-        input_ome_zarr_dataseth.shape,
+        stack_shape,
         transforms,
         no_adding_of_transforms=True,
         verbose=verbose

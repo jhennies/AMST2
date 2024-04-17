@@ -1,30 +1,42 @@
+import json
 
 if __name__ == '__main__':
 
     output = snakemake.output[0]
-    run_info = snakemake.params['run_info']
+    params = snakemake.params
+    output_ome_zarr_filepath = params['output_ome_zarr_filepath']
+    stack_shape = params['stack_shape']
+    resolution = params['resolution']
+    unit = params['unit']
+    downsample_type = params['downsample_type']
+    downsample_factors = params['downsample_factors']
+    chunk_size = params['chunk_size']
+    dtype = params['dtype']
+    name = params['name']
     n_threads = snakemake.threads
 
     print(f'output = {output}')
-    print(f'run_info = {run_info}')
     print(f'n_threads = {n_threads}')
 
-    from squirrel.library.ome_zarr import create_ome_zarr
-    from squirrel.library.io import load_data_handle, load_data_from_handle_stack
+    if isinstance(stack_shape, str):
+        stack_shape_split = str.split(stack_shape, ':')
+        print(f'stack_shape_split = {stack_shape_split}')
+        with open(stack_shape_split[0], mode='r') as f:
+            stack_shape = json.load(f)
+        for item in stack_shape_split[1:]:
+            stack_shape = stack_shape[item]
+        print(f'stack_shape = {stack_shape}')
 
-    dtype = load_data_from_handle_stack(
-        load_data_handle(run_info['stack_path'], run_info['stack_key'], run_info['stack_pattern'])[0],
-        0
-    )[0].dtype
+    from squirrel.library.ome_zarr import create_ome_zarr
 
     create_ome_zarr(
-        run_info['output_ome_zarr_filepath'],
-        shape=run_info['stack_shape'],
-        resolution=run_info['resolution'],
-        unit=run_info['unit'],
-        downsample_type=run_info['downsample_type'],
-        downsample_factors=run_info['downsample_factors'],
-        chunk_size=run_info['chunk_size'],
+        output_ome_zarr_filepath,
+        shape=stack_shape,
+        resolution=resolution,
+        unit=unit,
+        downsample_type=downsample_type,
+        downsample_factors=downsample_factors,
+        chunk_size=chunk_size,
         dtype=dtype,
-        name=run_info['name'],
+        name=name,
     )

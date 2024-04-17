@@ -18,11 +18,13 @@ if __name__ == '__main__':
 
     from squirrel.workflows.template_matching import template_matching_stack_alignment_workflow
 
+    # TODO parallize this (n_threads has no effect yet)
     template_matching_stack_alignment_workflow(
         run_info['input_ome_zarr_filepath'],
         output,
         **snakemake.params.template_matching_stack_alignment_workflow_params,
         z_range=z_range,
+        determine_bounds=snakemake.params['determine_bounds'],
         verbose=verbose
     )
 

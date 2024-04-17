@@ -33,7 +33,15 @@ rule create_ome_zarr:
     output:
         directory(run_info["output_ome_zarr_filepath"])
     params:
-        run_info=run_info
+        output_ome_zarr_filepath=run_info["output_ome_zarr_filepath"],
+        shape=run_info["shape"],
+        resolution=run_info["resolution"],
+        unit=run_info["unit"],
+        downsample_type=run_info["downsample_type"],
+        downsample_factors=run_info["downsample_factors"],
+        chunk_size=run_info["chunk_size"],
+        dtype=run_info["dtype"],
+        name=run_info["name"]
     threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "create_ome_zarr.py")

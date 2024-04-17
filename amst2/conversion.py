@@ -50,11 +50,12 @@ def snk_stack_to_ome_zarr():
 
     # Generate run.json ----------------------------------
 
-    from squirrel.library.io import load_data_handle
+    from squirrel.library.io import load_data_handle, load_data_from_handle_stack
     data_h, shape_h = load_data_handle(stack_path, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], args.batch_size)]
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
+    dtype = load_data_from_handle_stack(load_data_handle(stack_path, stack_key, stack_pattern)[0], 0)[0].dtype
 
     run_info = dict(
         stack_path=stack_path,
@@ -64,6 +65,7 @@ def snk_stack_to_ome_zarr():
         batch_ids=batch_ids,
         stack_shape=shape_h,
         src_dirpath=src_dirpath,
+        dtype=dtype,
         **output_location_args,
         **ome_zarr_args,
         **common_args

@@ -23,6 +23,7 @@ if __name__ == '__main__':
         output,
         **snakemake.params.elastix_stack_alignment_workflow_params,
         z_range=z_range,
+        determine_bounds=snakemake.params['determine_bounds'],
         verbose=verbose
     )
 

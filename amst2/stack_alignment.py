@@ -58,6 +58,7 @@ def snk_default_amst_pre_alignment():
     no_previews = args.no_previews
     tm_search_roi = args.tm_search_roi
     preview_downsample_level = args.preview_downsample_level
+    batch_size = args.batch_size
 
     common_args = common_args_to_dict(args)
     output_location_args = output_locations_to_dict(
@@ -69,12 +70,24 @@ def snk_default_amst_pre_alignment():
     # Generate run.json ----------------------------------
 
     from squirrel.library.io import load_data_handle
-    from squirrel.library.data import resolution_to_pixels
-    from squirrel.library.ome_zarr import get_scale_of_downsample_level, get_ome_zarr_handle
+    from squirrel.library.ome_zarr import (
+        get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset,
+        get_downsample_factors
+    )
     data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
-    batch_ids = [x for x in range(0, shape_h[0], args.batch_size)]
+    batch_ids = [x for x in range(0, shape_h[0], batch_size)]
     ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
     resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
+    unit = get_unit_of_dataset(ome_zarr_h)
+    dtype = str(data_h.dtype)
+    downsample_factors = get_downsample_factors(ome_zarr_h)
+
+    assert batch_size in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    chunk_size = [[batch_size, 64, 64]]
+    for ds_factor in downsample_factors:
+        z_chunk = int(chunk_size[-1][0] / ds_factor)
+        assert z_chunk > 0, 'Increase the chunk size or reduce downsample layers!'
+        chunk_size.append([z_chunk, 64, 64])
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
 
@@ -89,6 +102,12 @@ def snk_default_amst_pre_alignment():
         stack_shape=shape_h,
         src_dirpath=src_dirpath,
         preview_downsample_level=preview_downsample_level,
+        output_dtype=dtype,
+        resolution=resolution,
+        unit=unit,
+        downsample_type='Sample',
+        downsample_factors=downsample_factors,
+        chunk_size=chunk_size,
         local_alignment_params=dict(
             auto_mask=local_auto_mask,
             transform='translation',
