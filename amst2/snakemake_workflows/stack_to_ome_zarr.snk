@@ -34,7 +34,7 @@ rule create_ome_zarr:
         directory(run_info["output_ome_zarr_filepath"])
     params:
         output_ome_zarr_filepath=run_info["output_ome_zarr_filepath"],
-        shape=run_info["shape"],
+        stack_shape=run_info["stack_shape"],
         resolution=run_info["resolution"],
         unit=run_info["unit"],
         downsample_type=run_info["downsample_type"],

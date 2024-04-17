@@ -65,6 +65,9 @@ def snk_default_amst_pre_alignment():
         workflow_name='stack_alignment',
         fallback_output_name='pre-align.ome.zarr'
     )
+    preview_dirpath = os.path.join(output_location_args['target_dirpath'], 'previews')
+    if not os.path.exists(preview_dirpath):
+        os.mkdir(preview_dirpath)
 
     # Generate run.json ----------------------------------
 
@@ -107,6 +110,7 @@ def snk_default_amst_pre_alignment():
         downsample_type='Sample',
         downsample_factors=downsample_factors,
         chunk_size=chunk_size,
+        preview_dirpath=preview_dirpath,
         local_alignment_params=dict(
             auto_mask=local_auto_mask,
             transform='translation',

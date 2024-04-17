@@ -48,14 +48,26 @@ def snk_stack_to_ome_zarr():
         fallback_output_name=os.path.split(stack_path)[1].replace('.h5', '') + '.ome.zarr'
     )
 
+    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
+    chunk_size = [ome_zarr_args['chunk_size']]
+    downsample_factors = ome_zarr_args['downsample_factors']
+    for ds_factor in downsample_factors:
+        z_chunk = int(chunk_size[-1][0] / ds_factor)
+        if z_chunk == 0:
+            z_chunk = 1
+        # assert z_chunk > 0, 'Increase the chunk size or reduce downsample layers!'
+        chunk_size.append([z_chunk, chunk_size[0][1], chunk_size[0][1]])
+    ome_zarr_args['chunk_size'] = chunk_size
+
     # Generate run.json ----------------------------------
 
-    from squirrel.library.io import load_data_handle, load_data_from_handle_stack
+    from squirrel.library.io import load_data_handle
     data_h, shape_h = load_data_handle(stack_path, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], args.batch_size)]
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
-    dtype = load_data_from_handle_stack(load_data_handle(stack_path, stack_key, stack_pattern)[0], 0)[0].dtype
+    dtype = str(data_h[0].dtype)
 
     run_info = dict(
         stack_path=stack_path,

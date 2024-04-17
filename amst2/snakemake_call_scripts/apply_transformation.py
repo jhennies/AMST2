@@ -46,13 +46,6 @@ if __name__ == '__main__':
         verbose=verbose
     )
 
-    if run_info['downsample_type'] == 'Average':
-        downsample_order = 0
-    elif run_info['downsample_type'] == 'Sample':
-        downsample_order = 1
-    else:
-        raise ValueError(f'Invalid down-sample type: {run_info["downsample_type"]}')
-
     from squirrel.library.ome_zarr import chunk_to_ome_zarr
     chunk_to_ome_zarr(
         result_stack,
@@ -60,7 +53,6 @@ if __name__ == '__main__':
         get_ome_zarr_handle(output_ome_zarr_filepath, mode='a'),
         key='s0',
         populate_downsample_layers=True,
-        downsample_order=downsample_order,
         verbose=verbose
     )
 

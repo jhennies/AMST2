@@ -13,6 +13,7 @@ use_tm = run_info['use_template_matching']
 use_local = not run_info['no_local_alignment']
 preview = not run_info['no_previews']
 src_dirpath = run_info['src_dirpath']
+preview_dirpath = run_info['preview_dirpath']
 
 print(f'run_info = {run_info}')
 
@@ -20,11 +21,11 @@ print(f'run_info = {run_info}')
 def _rule_all_inputs(wildcards):
     inputs = []
     if use_tm and preview:
-        inputs.append(os.path.join(this_cache_dirpath, "template_matching_preview.h5"))
+        inputs.append(os.path.join(preview_dirpath, "template_matching_preview.h5"))
     if use_local and preview:
-        inputs.append(os.path.join(this_cache_dirpath, "local_preview.h5"))
+        inputs.append(os.path.join(preview_dirpath, "local_preview.h5"))
     inputs.extend([os.path.join(this_cache_dirpath, f"apply_final_transformations_{idx}.done") for idx in batch_ids])
-    inputs.append(os.path.join(this_cache_dirpath, "final_preview.h5"))
+    inputs.append(os.path.join(preview_dirpath, "final_preview.h5"))
     return inputs
 
 
@@ -76,7 +77,7 @@ rule final_preview:
     input:
         os.path.join(this_cache_dirpath,"finalize_and_join_transformations.json")
     output:
-        os.path.join(this_cache_dirpath, "final_preview.h5")
+        os.path.join(preview_dirpath, "final_preview.h5")
     params:
         run_info=run_info
     script:
@@ -109,7 +110,7 @@ rule template_matching_preview:
     input:
         expand(os.path.join(this_cache_dirpath,"template_matching_{idx}.json"),idx=batch_ids)
     output:
-        os.path.join(this_cache_dirpath, "template_matching_preview.h5")
+        os.path.join(preview_dirpath, "template_matching_preview.h5")
     params:
         run_info=run_info
     script:
@@ -131,7 +132,7 @@ rule local_alignment_preview:
     input:
         expand(os.path.join(this_cache_dirpath, "local_{idx}.json"), idx=batch_ids)
     output:
-        os.path.join(this_cache_dirpath, "local_preview.h5")
+        os.path.join(preview_dirpath, "local_preview.h5")
     params:
         run_info=run_info
     script:
