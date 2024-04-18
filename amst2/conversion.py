@@ -28,9 +28,9 @@ def snk_stack_to_ome_zarr():
     parser.add_argument('--save_bounds', action='store_true',
                         help='Saves a json file alongside that contains the bounds of the non-zero area of each slice')
 
-    add_common_arguments_to_parser(parser)
+    common_arg_fields = add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
-    add_ome_zarr_arguments_to_parser(parser)
+    ome_zarr_fields = add_ome_zarr_arguments_to_parser(parser)
     add_snakemake_arguments_to_parser(parser)
 
     args = parser.parse_args()
@@ -40,8 +40,8 @@ def snk_stack_to_ome_zarr():
     stack_key = args.stack_key
     save_bounds = args.save_bounds
 
-    ome_zarr_args = ome_zarr_args_to_dict(args)
-    common_args = common_args_to_dict(args)
+    ome_zarr_args = args_to_dict(args, ome_zarr_fields)
+    common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
         args,
         workflow_name='stack_to_ome_zarr',
@@ -56,7 +56,6 @@ def snk_stack_to_ome_zarr():
         z_chunk = int(chunk_size[-1][0] / ds_factor)
         if z_chunk == 0:
             z_chunk = 1
-        # assert z_chunk > 0, 'Increase the chunk size or reduce downsample layers!'
         chunk_size.append([z_chunk, chunk_size[0][1], chunk_size[0][1]])
     ome_zarr_args['chunk_size'] = chunk_size
 

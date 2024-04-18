@@ -10,7 +10,9 @@ def snk_default_amst_pre_alignment():
     from amst2.library.argument_parsing import (
         add_common_arguments_to_parser, common_args_to_dict,
         add_output_locations_to_parser, output_locations_to_dict,
+        add_ome_zarr_arguments_to_parser, ome_zarr_args_to_dict,
         add_snakemake_arguments_to_parser, args_to_snakemake_arguments,
+        args_to_dict,
         write_run_json
     )
 
@@ -42,8 +44,9 @@ def snk_default_amst_pre_alignment():
     parser.add_argument('--preview_downsample_level', type=int, default=2,
                         help='Downsample level of preview volumes; default=2')
 
-    add_common_arguments_to_parser(parser)
+    common_arg_fields = add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
+    ome_zarr_fields = add_ome_zarr_arguments_to_parser(parser, omit=['resolution'])
     add_snakemake_arguments_to_parser(parser)
 
     args = parser.parse_args()
@@ -59,12 +62,13 @@ def snk_default_amst_pre_alignment():
     preview_downsample_level = args.preview_downsample_level
     batch_size = args.batch_size
 
-    common_args = common_args_to_dict(args)
+    common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
         args,
         workflow_name='stack_alignment',
         fallback_output_name='pre-align.ome.zarr'
     )
+    ome_zarr_args = args_to_dict(args, ome_zarr_fields)
     preview_dirpath = os.path.join(output_location_args['target_dirpath'], 'previews')
     if not os.path.exists(preview_dirpath):
         os.mkdir(preview_dirpath)
@@ -82,14 +86,17 @@ def snk_default_amst_pre_alignment():
     resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
     unit = get_unit_of_dataset(ome_zarr_h)
     dtype = str(data_h.dtype)
-    downsample_factors = get_downsample_factors(ome_zarr_h)
 
-    assert batch_size in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
-    chunk_size = [[batch_size, 64, 64]]
+    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
+    chunk_size = [ome_zarr_args['chunk_size']]
+    downsample_factors = ome_zarr_args['downsample_factors']
     for ds_factor in downsample_factors:
         z_chunk = int(chunk_size[-1][0] / ds_factor)
-        assert z_chunk > 0, 'Increase the chunk size or reduce downsample layers!'
-        chunk_size.append([z_chunk, 64, 64])
+        if z_chunk == 0:
+            z_chunk = 1
+        chunk_size.append([z_chunk, chunk_size[0][1], chunk_size[0][1]])
+    ome_zarr_args['chunk_size'] = chunk_size
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
 
@@ -107,9 +114,6 @@ def snk_default_amst_pre_alignment():
         output_dtype=dtype,
         resolution=resolution,
         unit=unit,
-        downsample_type='Sample',
-        downsample_factors=downsample_factors,
-        chunk_size=chunk_size,
         preview_dirpath=preview_dirpath,
         local_alignment_params=dict(
             auto_mask=local_auto_mask,
@@ -126,6 +130,7 @@ def snk_default_amst_pre_alignment():
         ),
         **output_location_args,
         **common_args,
+        **ome_zarr_args
     )
 
     write_run_json(run_info, output_location_args)

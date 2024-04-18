@@ -24,4 +24,5 @@ snk_default_amst_pre_alignment \
   --local_auto_mask \
   --preview_downsample_level 3 \
   --template_roi 10.4 4.6 12.0 5.2 0.3 \
+  --chunk_size 1 512 512 \
   --cluster slurm

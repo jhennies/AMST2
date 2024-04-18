@@ -13,17 +13,7 @@ def add_common_arguments_to_parser(parser):
                         help='Use "--cluster slurm" to run on a slurm cluster (only tested on EMBL resources)')
     parser.add_argument('-v', '--verbose', action='store_true')
 
-
-def common_args_to_dict(args):
-
-    return dict(
-        cores=args.cores,
-        max_cores_per_task=args.max_cores_per_task,
-        batch_size=args.batch_size,
-        continue_run=args.continue_run,
-        cluster=args.cluster,
-        verbose=args.verbose
-    )
+    return ['cores', 'max_cores_per_task', 'batch_size', 'continue_run', 'cluster', 'verbose']
 
 
 def add_output_locations_to_parser(parser):
@@ -63,32 +53,36 @@ def output_locations_to_dict(args, workflow_name='wf', fallback_output_name='out
     )
 
 
-def add_ome_zarr_arguments_to_parser(parser):
+def add_ome_zarr_arguments_to_parser(parser, omit=[]):
 
-    parser.add_argument('--resolution', type=float, nargs=3, default=(1., 1., 1.),
-                        help='Resolution of input data; default=(1., 1., 1.)')
-    parser.add_argument('--unit', type=str, default='pixel',
-                        help='Unit of input resolution; default="pixel"')
-    parser.add_argument('--downsample_type', type=str, default='Average',
-                        help='Downsample type used to create the resolution pyramid; default="Average"')
-    parser.add_argument('--downsample_factors', type=int, nargs='+', default=(2, 2, 2),
-                        help='Downsample factors used to create the resolution pyramid; default=(2, 2, 2)')
-    parser.add_argument('--chunk_size', type=int, nargs=3, default=[1, 512, 512],
-                        help='Chunk size of the ome-zarr dataset; default=[1, 512, 512]')
-    parser.add_argument('--name', type=str, default=None,
-                        help='Name of the dataset; defaults to the filename (without ome.zarr extension)')
+    names = []
+
+    if 'resolution' not in omit:
+        parser.add_argument('--resolution', type=float, nargs=3, default=(1., 1., 1.),
+                            help='Resolution of input data; default=(1., 1., 1.)')
+        parser.add_argument('--unit', type=str, default='pixel',
+                            help='Unit of input resolution; default="pixel"')
+        names.extend(['resolution', 'unit'])
+    if 'downsample' not in omit:
+        parser.add_argument('--downsample_type', type=str, default='Average',
+                            help='Downsample type used to create the resolution pyramid; default="Average"')
+        parser.add_argument('--downsample_factors', type=int, nargs='+', default=(2, 2, 2),
+                            help='Downsample factors used to create the resolution pyramid; default=(2, 2, 2)')
+        names.extend(['downsample_type', 'downsample_factors'])
+    if 'chunk_size' not in omit:
+        parser.add_argument('--chunk_size', type=int, nargs=3, default=[1, 512, 512],
+                            help='Chunk size of the ome-zarr dataset; default=[1, 512, 512]')
+        names.append('chunk_size')
+    if 'name' not in omit:
+        parser.add_argument('--name', type=str, default=None,
+                            help='Name of the dataset; defaults to the filename (without ome.zarr extension)')
+        names.append('name')
+
+    return names
 
 
-def ome_zarr_args_to_dict(args):
-
-    return dict(
-        resolution=args.resolution,
-        unit=args.unit,
-        downsample_type=args.downsample_type,
-        downsample_factors=args.downsample_factors,
-        name=args.name,
-        chunk_size=args.chunk_size
-    )
+def args_to_dict(args, fields):
+    return {field: getattr(args, field) for field in fields}
 
 
 def add_snakemake_arguments_to_parser(parser):
