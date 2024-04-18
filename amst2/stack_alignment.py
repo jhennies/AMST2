@@ -159,7 +159,7 @@ def snk_default_amst_pre_alignment():
                 runtime=30
             ),
             template_matching=dict(
-                mem_mb=16000,
+                mem_mb=24000,
                 runtime=30
             ),
             template_matching_preview=dict(
