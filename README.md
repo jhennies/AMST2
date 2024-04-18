@@ -13,10 +13,24 @@ by Simple Elastix functionality.
 
 ## Installation
 
-TODO conda recipe
-
+Clone squirrel and AMST2 repositories:
 ```
-conda install -c bioconda snakemake=8
+cd path/to/src
+git clone https://github.com/jhennies/squirrel
+git clone https://github.com/jhennies/AMST2
+```
+
+Install the packages:
+```
+cd path/to/src
+mamba create -n amst2-env -c conda-forge -c bioconda python=3.11 snakemake=8
+conda activate amst2-env
+pip install -e squirrel
+pip install -e AMST2
+pip install SimpleITK-SimpleElastix
+pip install transforms3d
+mamba install -c conda-forge opencv
+mamba install -c conda-forge zarr
 ```
 
 ## Usage
