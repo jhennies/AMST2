@@ -173,8 +173,8 @@ def snk_default_amst_pre_alignment():
                 mem_mb=1024,
                 runtime=5
             ),
-            apply_final_transform=dict(
-                mem_mb=256000,
+            apply_final_transformations=dict(
+                mem_mb=8000,
                 runtime=30
             )
         )
