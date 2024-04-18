@@ -106,7 +106,7 @@ def snk_stack_to_ome_zarr():
                 runtime=10
             ),
             create_ome_zarr=dict(
-                mem_mb=100,
+                mem_mb=1024,
                 runtime=5
             )
         )

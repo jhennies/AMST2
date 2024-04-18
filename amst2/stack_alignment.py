@@ -146,19 +146,19 @@ def snk_default_amst_pre_alignment():
 
         sn_args.set_resources = dict(
             elastix_stack_alignment=dict(
-                mem_mb=1024,
+                mem_mb=16000,
                 runtime=30
             ),
             local_alignment_preview=dict(
-                mem_mb=1024,
+                mem_mb=8000,
                 runtime=30
             ),
             template_matching=dict(
-                mem_mb=1024,
+                mem_mb=16000,
                 runtime=30
             ),
             template_matching_preview=dict(
-                mem_mb=1024,
+                mem_mb=8000,
                 runtime=30
             ),
             finalize_and_join_transforms=dict(
@@ -166,15 +166,15 @@ def snk_default_amst_pre_alignment():
                 runtime=5
             ),
             final_preview=dict(
-                mem_mb=1024,
+                mem_mb=8000,
                 runtime=30
             ),
             create_ome_zarr=dict(
-                mem_mb=100,
+                mem_mb=1024,
                 runtime=5
             ),
             apply_final_transform=dict(
-                mem_mb=1024,
+                mem_mb=256000,
                 runtime=30
             )
         )
