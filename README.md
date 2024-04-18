@@ -33,6 +33,11 @@ mamba install -c conda-forge opencv
 mamba install -c conda-forge zarr
 ```
 
+To use a slurm cluster:
+```
+pip install snakemake-executor-plugin-slurm
+```
+
 ## Usage
 
  1. Conversion to ome.zarr

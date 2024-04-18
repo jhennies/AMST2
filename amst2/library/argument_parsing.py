@@ -2,11 +2,11 @@
 def add_common_arguments_to_parser(parser):
 
     parser.add_argument('--cores', type=int, default=1,
-                        help='Maximum number of available cores')
+                        help='Maximum number of available cores; default=1')
     parser.add_argument('--max_cores_per_task', type=int, default=16,
-                        help='Maximum number of cores available to one task')
-    parser.add_argument('--batch_size', type=int, default=16,
-                        help='Number of slices forming one batch; default=16')
+                        help='Maximum number of cores available to one task; default=16')
+    parser.add_argument('--batch_size', type=int, default=64,
+                        help='Number of slices forming one batch; default=64')
     parser.add_argument('--continue_run', action='store_true',
                         help='Needed to continue a run')
     parser.add_argument('--cluster', type=str, default=None,
@@ -107,6 +107,7 @@ def args_to_snakemake_arguments(args, sn_args, output_location_args=None):
     sn_args.unlock = args.unlock
     sn_args.cores = args.cores
     sn_args.rerun_triggers = args.rerun_triggers
+    sn_args.printshellcmds = True
     if output_location_args is not None:
         from pathlib import Path
         sn_args.directory = Path(output_location_args['this_cache_dirpath'])
