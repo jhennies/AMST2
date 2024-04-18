@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     stack_shape = input_ome_zarr_dataseth.shape
     if transforms.exists_meta('stack_shape'):
-        stack_shape = np.array(transforms.get_meta('stack_shape')) * scale
+        stack_shape = (np.array(transforms.get_meta('stack_shape')) * scale).astype(int)
 
     result_stack = apply_stack_alignment(
         input_ome_zarr_dataseth,
