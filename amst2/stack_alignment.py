@@ -140,7 +140,46 @@ def snk_default_amst_pre_alignment():
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/default_amst_pre_alignment.snk'))
     sn_args.set_threads = dict(elastix_stack_alignment=min(args.batch_size, args.cores))
 
-    # TODO add cluster args here
+    if args.cluster is not None:
+
+        from amst2.cluster.slurm import get_cluster_settings
+
+        sn_args.set_resources = dict(
+            elastix_stack_alignment=dict(
+                mem_mb=1024,
+                runtime=30
+            ),
+            local_alignment_preview=dict(
+                mem_mb=1024,
+                runtime=30
+            ),
+            template_matching=dict(
+                mem_mb=1024,
+                runtime=30
+            ),
+            template_matching_preview=dict(
+                mem_mb=1024,
+                runtime=30
+            ),
+            finalize_and_join_transforms=dict(
+                mem_mb=100,
+                runtime=5
+            ),
+            final_preview=dict(
+                mem_mb=1024,
+                runtime=30
+            ),
+            create_ome_zarr=dict(
+                mem_mb=100,
+                runtime=5
+            ),
+            apply_final_transform=dict(
+                mem_mb=1024,
+                runtime=30
+            )
+        )
+
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
 
     args_to_api(sn_args, parser)
 
