@@ -143,7 +143,11 @@ def snk_default_amst_pre_alignment():
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/default_amst_pre_alignment.snk'))
-    sn_args.set_threads = dict(elastix_stack_alignment=min(args.batch_size, args.cores))
+    sn_args.set_threads = dict(
+        elastix_stack_alignment=min(args.batch_size, args.cores, args.max_cores_per_task),
+        template_matching=min(args.batch_size, args.cores, args.max_cores_per_task),
+        apply_final_transformations=min(args.batch_size, args.cores, args.max_cores_per_task)
+    )
 
     if args.cluster is not None:
 

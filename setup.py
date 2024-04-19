@@ -14,6 +14,7 @@ setup(
     entry_points={
         'console_scripts': [
             'snk_stack_to_ome_zarr = amst2.conversion:snk_stack_to_ome_zarr',
+            'snk_ome_zarr_to_stack = amst2.conversion:snk_ome_zarr_to_stack',
             'snk_default_amst_pre_alignment = amst2.stack_alignment:snk_default_amst_pre_alignment'
         ]
     },

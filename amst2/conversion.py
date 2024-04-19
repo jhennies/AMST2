@@ -116,5 +116,107 @@ def snk_stack_to_ome_zarr():
     args_to_api(sn_args, parser)
 
 
+def snk_ome_zarr_to_stack():
+
+    # Argument parsing -----------------------------------
+
+    import argparse
+    from amst2.library.argument_parsing import (
+        add_common_arguments_to_parser,
+        add_snakemake_arguments_to_parser, args_to_snakemake_arguments,
+        args_to_dict,
+        write_run_json
+    )
+
+    parser = argparse.ArgumentParser(
+        description='Convert a dataset within a h5 container or a tif stack to ome.zarr',
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument('ome_zarr_filepath', type=str,
+                        help='Ome-zarr dataset which will be converted to tif stack')
+    parser.add_argument('target_dirpath', type=str,
+                        help='Output directory which will contain the tif slices.')
+    parser.add_argument('stack_name', type=str,
+                        help='Name of the tif stack (will be a subfolder of the target dirpath)')
+    parser.add_argument('--ome_zarr_key', type=str, default='s0',
+                        help='Path within input ome-zarr dataset; default="s0"')
+
+    common_arg_fields = add_common_arguments_to_parser(parser)
+    add_snakemake_arguments_to_parser(parser)
+
+    args = parser.parse_args()
+
+    ome_zarr_filepath = args.ome_zarr_filepath
+    target_dirpath = args.target_dirpath
+    stack_name = args.stack_name
+    ome_zarr_key = args.ome_zarr_key
+
+    common_args = args_to_dict(args, common_arg_fields)
+
+    from amst2.library.input_file_and_dirpaths import make_cache_folder_structure
+    cache_dirpath, this_cache_dirpath = make_cache_folder_structure(
+        target_dirpath,
+        f'ome_zarr_to_stack_{stack_name}',
+        continue_run=common_args['continue_run']
+    )
+
+    output_location_args = dict(
+        cache_dirpath=cache_dirpath,
+        this_cache_dirpath=this_cache_dirpath
+    )
+
+    tif_stack_dirpath = os.path.join(target_dirpath, stack_name)
+
+    # Generate run.json ----------------------------------
+
+    from squirrel.library.ome_zarr import get_ome_zarr_handle
+    data_h = get_ome_zarr_handle(ome_zarr_filepath, key=ome_zarr_key, mode='r')
+    batch_ids = [x for x in range(0, data_h.shape[0], args.batch_size)]
+
+    src_dirpath = os.path.dirname(os.path.realpath(__file__))
+    dtype = str(data_h[0].dtype)
+
+    run_info = dict(
+        ome_zarr_filepath=ome_zarr_filepath,
+        ome_zarr_key=ome_zarr_key,
+        target_dirpath=target_dirpath,
+        batch_ids=batch_ids,
+        stack_shape=data_h.shape,
+        src_dirpath=src_dirpath,
+        dtype=dtype,
+        cache_dirpath=cache_dirpath,
+        this_cache_dirpath=this_cache_dirpath,
+        tif_stack_dirpath=tif_stack_dirpath,
+        **common_args
+    )
+
+    write_run_json(run_info, output_location_args)
+
+    # Snakemake stuff ------------------------------------
+
+    from snakemake.cli import parse_args, args_to_api
+    from pathlib import Path
+
+    parser, sn_args = parse_args({})
+    args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
+    sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/ome_zarr_to_stack.snk'))
+    sn_args.set_threads = dict(ome_zarr_batch_to_stack=min(args.batch_size, args.cores, args.max_cores_per_task))
+
+    if args.cluster is not None:
+        from amst2.cluster.slurm import get_cluster_settings
+
+        sn_args.set_resources = dict(
+            ome_zarr_batch_to_stack=dict(
+                # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
+                mem_mb=8000,  # int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
+                runtime=10
+            )
+        )
+
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+
+    args_to_api(sn_args, parser)
+
+
 if __name__ == '__main__':
     snk_stack_to_ome_zarr()

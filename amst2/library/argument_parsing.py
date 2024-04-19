@@ -19,7 +19,7 @@ def add_common_arguments_to_parser(parser):
 def add_output_locations_to_parser(parser):
 
     parser.add_argument('target_dirpath', type=str,
-                        help='Output director which will contain the cache directory and, by default, also the '
+                        help='Output directory which will contain the cache directory and, by default, also the '
                              'ome.zarr output')
     parser.add_argument('-out-oz-fn', '--output_ome_zarr_filename', type=str, default=None,
                         help='Filename of the ome.zarr output')
