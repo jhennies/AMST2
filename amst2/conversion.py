@@ -93,7 +93,7 @@ def snk_stack_to_ome_zarr():
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/stack_to_ome_zarr.snk'))
-    sn_args.set_threads = dict(batch_to_ome_zarr=min(args.batch_size, args.cores))
+    sn_args.set_threads = dict(batch_to_ome_zarr=1)
 
     if args.cluster is not None:
         # from amst2.library.data import estimate_mem_mb
@@ -200,7 +200,7 @@ def snk_ome_zarr_to_stack():
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/ome_zarr_to_stack.snk'))
-    sn_args.set_threads = dict(ome_zarr_batch_to_stack=min(args.batch_size, args.cores, args.max_cores_per_task))
+    sn_args.set_threads = dict(ome_zarr_batch_to_stack=1)
 
     if args.cluster is not None:
         from amst2.cluster.slurm import get_cluster_settings
