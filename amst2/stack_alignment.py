@@ -156,7 +156,7 @@ def snk_default_amst_pre_alignment():
 
         sn_args.set_resources = dict(
             elastix_stack_alignment=dict(
-                mem_mb=16000,
+                mem_mb=24000,
                 runtime=30,
             ),
             local_alignment_preview=dict(
