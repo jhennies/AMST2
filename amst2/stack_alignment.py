@@ -60,7 +60,6 @@ def snk_default_amst_pre_alignment():
     no_previews = args.no_previews
     tm_search_roi = args.tm_search_roi
     preview_downsample_level = args.preview_downsample_level
-    batch_size = args.batch_size
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -80,11 +79,10 @@ def snk_default_amst_pre_alignment():
 
     from squirrel.library.io import load_data_handle
     from squirrel.library.ome_zarr import (
-        get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset,
-        get_downsample_factors
+        get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset
     )
     data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
-    batch_ids = [x for x in range(0, shape_h[0], batch_size)]
+    batch_ids = [x for x in range(0, shape_h[0], common_args['batch_size'])]
     ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
     resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
     unit = get_unit_of_dataset(ome_zarr_h)
