@@ -43,8 +43,12 @@ def snk_default_amst_pre_alignment():
                         help='No preview outputs are generated for the alignement steps')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
-                             'Define like so:\n'
+                             'For each rule define like so:\n'
                              '"rule_name:16000"')
+    parser.add_argument('--runtime', type=str, nargs='+', default=None,
+                        help='Cluster job runtimes for the snakemake rules. \n'
+                             'For each rule define like so:\n'
+                             '"rule_name:30"')
     parser.add_argument('--preview_downsample_level', type=int, default=2,
                         help='Downsample level of preview volumes; default=2')
 
@@ -65,6 +69,7 @@ def snk_default_amst_pre_alignment():
     tm_search_roi = args.tm_search_roi
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
+    runtime = args.runtime
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -158,46 +163,24 @@ def snk_default_amst_pre_alignment():
     if args.cluster is not None:
 
         from amst2.cluster.slurm import get_cluster_settings
+        from amst2.cluster.general import set_resources
 
-        mem_dict = dict()
-        if mem is not None:
-            for entry in mem:
-                rule_name, value = str.split(entry, ':')
-                mem_dict[rule_name] = int(value)
-
-        sn_args.set_resources = dict(
-            elastix_stack_alignment=dict(
-                mem_mb=16000 if 'elastix_stack_alignment' not in mem_dict else mem_dict['elastix_stack_alignment'],
-                runtime=30,
-            ),
-            local_alignment_preview=dict(
-                mem_mb=8000 if 'local_alignment_preview' not in mem_dict else mem_dict['local_alignment_preview'],
-                runtime=30
-            ),
-            template_matching=dict(
-                mem_mb=24000 if 'template_matching' not in mem_dict else mem_dict['template_matching'],
-                runtime=30
-            ),
-            template_matching_preview=dict(
-                mem_mb=8000 if 'template_matching_preview' not in mem_dict else mem_dict['template_matching_preview'],
-                runtime=30
-            ),
-            finalize_and_join_transforms=dict(
-                mem_mb=100 if 'finalize_and_join_transforms' not in mem_dict else mem_dict['finalize_and_join_transforms'],
-                runtime=5
-            ),
-            final_preview=dict(
-                mem_mb=8000 if 'final_preview' not in mem_dict else mem_dict['final_preview'],
-                runtime=30
-            ),
-            create_ome_zarr=dict(
-                mem_mb=1024 if 'create_ome_zarr' not in mem_dict else mem_dict['create_ome_zarr'],
-                runtime=5
-            ),
-            apply_final_transformations=dict(
-                mem_mb=8000 if 'apply_final_transformations' not in mem_dict else mem_dict['apply_final_transformations'],
-                runtime=30
-            )
+        set_resources(
+            sn_args,
+            [
+                'elastix_stack_alignment',
+                'local_alignment_preview',
+                'template_matching',
+                'template_matching_preview',
+                'finalize_and_join_transforms',
+                'final_preview',
+                'create_ome_zarr',
+                'apply_final_transformations'
+            ],
+            [16000, 8000, 24000, 8000, 100, 8000, 1024, 8000],
+            [30, 30, 30, 30, 5, 30, 5, 30],
+            mem_args=mem,
+            runtime_args=runtime
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
