@@ -25,6 +25,8 @@ def snk_default_amst_pre_alignment():
                         help='Input ome zarr filepath')
     parser.add_argument('--local_auto_mask', action='store_true',
                         help='Generates a mask using image > 0')
+    parser.add_argument('--local_gaussian_sigma', type=float, default=0.,
+                        help='Perform a gaussian smoothing before registration')
     parser.add_argument('--no_local_alignment', action='store_true',
                         help='Use this flag to turn off the local (slice-to-slice) alignment')
     parser.add_argument('--template_roi', type=float, nargs=5, default=None,
@@ -61,6 +63,7 @@ def snk_default_amst_pre_alignment():
 
     input_ome_zarr_filepath = args.input_ome_zarr_filepath
     local_auto_mask = args.local_auto_mask
+    local_gaussian_sigma = args.local_gaussian_sigma
     no_local_alignment = args.no_local_alignment
     template_roi = args.template_roi
     combine_median = args.combine_median
@@ -128,6 +131,7 @@ def snk_default_amst_pre_alignment():
         meta_dirpath=meta_dirpath,
         local_alignment_params=dict(
             auto_mask=local_auto_mask,
+            gaussian_sigma=local_gaussian_sigma,
             transform='translation',
             key='s0',
             pre_fix_big_jumps=True  # Hard-coding because if slices are off it really doesn't work otherwise!
