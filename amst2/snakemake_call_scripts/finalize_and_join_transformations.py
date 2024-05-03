@@ -37,7 +37,7 @@ if __name__ == '__main__':
         final_transforms = tm_transforms
         final_transforms.set_meta('bounds', tm_transforms.get_meta('bounds'))
 
-    elif not use_local and use_local:
+    elif not use_tm and use_local:
 
         local_filepaths = sn_input
         local_transforms = load_affine_stack_from_multiple_files(local_filepaths)

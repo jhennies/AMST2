@@ -113,3 +113,4 @@ def write_run_json(run_info, output_location_args):
     with open(os.path.join(output_location_args['this_cache_dirpath'], 'run.json'), mode='w') as f:
         json.dump(run_info, f, indent=2)
 
+
