@@ -134,7 +134,8 @@ def snk_default_amst_pre_alignment():
             gaussian_sigma=local_gaussian_sigma,
             transform='translation',
             key='s0',
-            pre_fix_big_jumps=True  # Hard-coding because if slices are off it really doesn't work otherwise!
+            pre_fix_big_jumps=True,  # Hard-coding because if slices are off it really doesn't work otherwise!
+            pre_fix_iou_thresh=0.9
         ),
         template_matching_params=dict(
             template_roi=template_roi,
