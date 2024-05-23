@@ -37,6 +37,9 @@ if __name__ == '__main__':
     # Serialize and apply the transformations
     from squirrel.library.transformation import apply_stack_alignment
     from squirrel.library.affine_matrices import AffineStack
+    print(f'z_range = {z_range}')
+    print(f'transforms = {len(transforms)}')
+    print(f'transforms[z_range[0]: z_range[1]] = {transforms[z_range[0]: z_range[1]]}')
     result_stack = apply_stack_alignment(
         input_ome_zarr_dataseth,
         stack_shape,

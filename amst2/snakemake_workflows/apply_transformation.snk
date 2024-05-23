@@ -1,0 +1,61 @@
+
+import os
+import json
+
+print(os.getcwd())
+print(__file__)
+with open('run.json', mode='r') as f:
+    run_info = json.load(f)
+
+this_cache_dirpath = run_info['this_cache_dirpath']
+batch_ids = run_info['batch_ids']
+src_dirpath = run_info['src_dirpath']
+
+print(f'run_info = {run_info}')
+
+
+def _rule_all_inputs(wildcards):
+    inputs = []
+    inputs.extend([os.path.join(this_cache_dirpath, f"apply_final_transformations_{idx}.done") for idx in batch_ids])
+    return inputs
+
+
+rule all:
+    input:
+        _rule_all_inputs
+
+
+rule apply_final_transformations:
+    input:
+        run_info["output_ome_zarr_filepath"],
+        run_info["input_transforms_filepath"]
+    output:
+        os.path.join(this_cache_dirpath, "apply_final_transformations_{idx}.done")
+    params:
+        run_info=run_info
+    threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
+    script:
+        os.path.join(src_dirpath, "snakemake_call_scripts", "apply_transformation.py")
+
+
+def _get_target_stack_shape():
+    stack_shape_json = run_info["input_transforms_filepath"]
+    return f'{stack_shape_json}:meta:stack_shape'
+
+
+rule create_ome_zarr:
+    output:
+        directory(run_info["output_ome_zarr_filepath"])
+    params:
+        output_ome_zarr_filepath=run_info["output_ome_zarr_filepath"],
+        stack_shape=_get_target_stack_shape(),
+        resolution=run_info["resolution"],
+        unit=run_info["unit"],
+        downsample_type=run_info["downsample_type"],
+        downsample_factors=run_info["downsample_factors"],
+        chunk_size=run_info["chunk_size"],
+        dtype=run_info["output_dtype"],
+        name=run_info["name"]
+    threads: 1
+    script:
+        os.path.join(src_dirpath, "snakemake_call_scripts", "create_ome_zarr.py")

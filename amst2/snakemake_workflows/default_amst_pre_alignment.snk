@@ -150,7 +150,7 @@ rule elastix_stack_alignment:
         os.path.join(this_cache_dirpath,"local_{idx}.json")
     params:
         run_info=run_info,
-        elastix_stack_alignment_workflow_params=run_info['local_alignment_params'],
+        elastix_stack_alignment_workflow_params=run_info['elastix_stack_alignment_workflow_params'],
         determine_bounds=not use_tm
     threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
     script:
