@@ -28,6 +28,14 @@ def snk_stack_to_ome_zarr():
                         help='Path within input h5 file; default="data"')
     parser.add_argument('--save_bounds', action='store_true',
                         help='Saves a json file alongside that contains the bounds of the non-zero area of each slice')
+    parser.add_argument('--mem', type=str, nargs='+', default=None,
+                        help='Cluster job memory amounts for the snakemake rules.\n'
+                             'For each rule define like so:\n'
+                             '"rule_name:16000"')
+    parser.add_argument('--runtime', type=str, nargs='+', default=None,
+                        help='Cluster job runtimes for the snakemake rules. \n'
+                             'For each rule define like so:\n'
+                             '"rule_name:30"')
 
     common_arg_fields = add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
@@ -40,6 +48,8 @@ def snk_stack_to_ome_zarr():
     stack_pattern = args.stack_pattern
     stack_key = args.stack_key
     save_bounds = args.save_bounds
+    mem = args.mem
+    runtime = args.runtime
 
     ome_zarr_args = args_to_dict(args, ome_zarr_fields)
     common_args = args_to_dict(args, common_arg_fields)
@@ -96,19 +106,19 @@ def snk_stack_to_ome_zarr():
     sn_args.set_threads = dict(batch_to_ome_zarr=1)
 
     if args.cluster is not None:
-        # from amst2.library.data import estimate_mem_mb
         from amst2.cluster.slurm import get_cluster_settings
+        from amst2.cluster.general import set_resources
 
-        sn_args.set_resources = dict(
-            batch_to_ome_zarr=dict(
-                # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-                mem_mb=8000,  # int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
-                runtime=10
-            ),
-            create_ome_zarr=dict(
-                mem_mb=1024,
-                runtime=5
-            )
+        set_resources(
+            sn_args,
+            [
+                'batch_to_ome_zarr',
+                'create_ome_zarr'
+            ],
+            [8000, 1024],
+            [10, 5],
+            mem_args=mem,
+            runtime_args=runtime
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
