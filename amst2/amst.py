@@ -114,51 +114,23 @@ def snk_amst():
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
     sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/amst.snk'))
-    # TODO
     sn_args.set_threads = dict(
-        # elastix_stack_alignment=min(args.batch_size, args.cores, args.max_cores_per_task),
-        # template_matching=min(args.batch_size, args.cores, args.max_cores_per_task),
-        # apply_final_transformations=min(args.batch_size, args.cores, args.max_cores_per_task)
+        amst=min(args.batch_size, args.cores, args.max_cores_per_task)
     )
 
     if args.cluster is not None:
 
         from amst2.cluster.slurm import get_cluster_settings
 
-        # TODO
         sn_args.set_resources = dict(
-            # elastix_stack_alignment=dict(
-            #     mem_mb=16000,
-            #     runtime=30,
-            # ),
-            # local_alignment_preview=dict(
-            #     mem_mb=8000,
-            #     runtime=30
-            # ),
-            # template_matching=dict(
-            #     mem_mb=24000,
-            #     runtime=30
-            # ),
-            # template_matching_preview=dict(
-            #     mem_mb=8000,
-            #     runtime=30
-            # ),
-            # finalize_and_join_transforms=dict(
-            #     mem_mb=100,
-            #     runtime=5
-            # ),
-            # final_preview=dict(
-            #     mem_mb=8000,
-            #     runtime=30
-            # ),
-            # create_ome_zarr=dict(
-            #     mem_mb=1024,
-            #     runtime=5
-            # ),
-            # apply_final_transformations=dict(
-            #     mem_mb=8000,
-            #     runtime=30
-            # )
+            amst=dict(
+                mem_mb=24000,
+                runtime=30
+            ),
+            amst_preview=dict(
+                mem_mb=8000,
+                runtime=30
+            )
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
