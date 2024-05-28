@@ -25,6 +25,12 @@ def snk_normalize_stack():
                         help='Input ome zarr filepath')
     parser.add_argument('--dilate_background', type=int, default=0,
                         help='Dilate the background before computing data quantiles. default=0 (off)')
+    parser.add_argument('--quantiles', type=float, nargs=2, default=(0.1, 0.9),
+                        help='Lower and upper quantile of the gray value spectrum that is used to normalize;'
+                             'default=(0.1, 0.9)')
+    parser.add_argument('--anchors', type=float, nargs=2, default=(0.2, 0.8),
+                        help='The lower and upper quantiles of the input gray value spectrum are transferred to these '
+                             'relative values; default=(0.2, 0.8)')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -43,6 +49,8 @@ def snk_normalize_stack():
 
     input_ome_zarr_filepath = args.input_ome_zarr_filepath
     dilate_background = args.dilate_background
+    quantiles = args.quantiles
+    anchors = args.anchors
     mem = args.mem
     runtime = args.runtime
 
@@ -90,6 +98,8 @@ def snk_normalize_stack():
         unit=unit,
         dtype=dtype,
         dilate_background=dilate_background,
+        quantiles=quantiles,
+        anchors=anchors,
         **output_location_args,
         **common_args,
         **ome_zarr_args
