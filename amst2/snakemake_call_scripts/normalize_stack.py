@@ -32,7 +32,7 @@ if __name__ == '__main__':
     from squirrel.library.normalization import normalize_slices
     print(f'z_range = {z_range}')
     result_stack = normalize_slices(
-        input_ome_zarr_dataseth, z_range=z_range, n_workers=n_threads
+        input_ome_zarr_dataseth, dilate_background=run_info['dilate_background'], z_range=z_range, n_workers=n_threads
     )
 
     from squirrel.library.ome_zarr import chunk_to_ome_zarr
