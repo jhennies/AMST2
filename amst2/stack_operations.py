@@ -116,7 +116,7 @@ def snk_normalize_stack():
                 'create_ome_zarr',
                 'normalize_stack'
             ],
-            [1024, 8000],
+            [1024, 16000],
             [5, 30],
             mem_args=mem,
             runtime_args=runtime
