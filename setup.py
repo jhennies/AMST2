@@ -18,7 +18,8 @@ setup(
             'snk_default_amst_pre_alignment = amst2.stack_alignment:snk_default_amst_pre_alignment',
             'snk_amst = amst2.amst:snk_amst',
             'snk_elastix_stack_alignment = amst2.stack_alignment:snk_elastix_stack_alignment',
-            'snk_apply_transformation = amst2.stack_alignment:snk_apply_transformation'
+            'snk_apply_transformation = amst2.stack_alignment:snk_apply_transformation',
+            'snk_normalize_stack = amst2.stack_operations:snk_normalize_stack'
         ]
     },
     install_requires=[
