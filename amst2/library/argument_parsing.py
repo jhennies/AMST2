@@ -30,22 +30,25 @@ def add_output_locations_to_parser(parser):
 def output_locations_to_dict(args, workflow_name='wf', fallback_output_name='output'):
 
     from amst2.library.input_file_and_dirpaths import make_cache_folder_structure, solve_output_path_and_name
+    import os
 
     output_ome_zarr_filepath, output_ome_zarr_filename = solve_output_path_and_name(
-        args.output_ome_zarr_filepath,
+        os.path.abspath(args.output_ome_zarr_filepath) if args.output_ome_zarr_filepath is not None else None,
         args.output_ome_zarr_filename,
-        args.target_dirpath,
+        os.path.abspath(args.target_dirpath) if args.target_dirpath is not None else None,
         fallback_output_name
     )
 
+    target_dirpath = os.path.abspath(args.target_dirpath)
+
     cache_dirpath, this_cache_dirpath = make_cache_folder_structure(
-        args.target_dirpath,
+        target_dirpath,
         f'{workflow_name}_{output_ome_zarr_filename.replace(".ome.zarr", "")}',
         continue_run=args.continue_run
     )
 
     return dict(
-        target_dirpath=args.target_dirpath,
+        target_dirpath=target_dirpath,
         output_ome_zarr_filename=output_ome_zarr_filename,
         output_ome_zarr_filepath=output_ome_zarr_filepath,
         cache_dirpath=cache_dirpath,

@@ -265,6 +265,8 @@ def snk_elastix_stack_alignment():
     mem = args.mem
     runtime = args.runtime
 
+    input_ome_zarr_filepath = os.path.abspath(input_ome_zarr_filepath)
+
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
         args,
