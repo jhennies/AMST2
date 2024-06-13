@@ -39,7 +39,7 @@ def snk_amst():
 
     args = parser.parse_args()
 
-    input_ome_zarr_filepath = args.input_ome_zarr_filepath
+    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
     auto_mask_off = args.auto_mask_off
     median_radius = args.median_radius
     no_previews = args.no_previews

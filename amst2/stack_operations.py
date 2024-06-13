@@ -47,7 +47,7 @@ def snk_normalize_stack():
 
     args = parser.parse_args()
 
-    input_ome_zarr_filepath = args.input_ome_zarr_filepath
+    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
     dilate_background = args.dilate_background
     quantiles = args.quantiles
     anchors = args.anchors

@@ -156,8 +156,8 @@ def snk_ome_zarr_to_stack():
 
     args = parser.parse_args()
 
-    ome_zarr_filepath = args.ome_zarr_filepath
-    target_dirpath = args.target_dirpath
+    ome_zarr_filepath = os.path.abspath(args.ome_zarr_filepath)
+    target_dirpath = os.path.abspath(args.target_dirpath)
     stack_name = args.stack_name
     ome_zarr_key = args.ome_zarr_key
 
