@@ -61,7 +61,7 @@ def snk_default_amst_pre_alignment():
 
     args = parser.parse_args()
 
-    input_ome_zarr_filepath = args.input_ome_zarr_filepath
+    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
     local_auto_mask = args.local_auto_mask
     local_gaussian_sigma = args.local_gaussian_sigma
     no_local_alignment = args.no_local_alignment
@@ -251,7 +251,7 @@ def snk_elastix_stack_alignment():
 
     args = parser.parse_args()
 
-    input_ome_zarr_filepath = args.input_ome_zarr_filepath
+    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
     transform = args.transform
     auto_mask = args.auto_mask
     gaussian_sigma = args.gaussian_sigma
@@ -264,8 +264,6 @@ def snk_elastix_stack_alignment():
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
-
-    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -413,8 +411,8 @@ def snk_apply_transformation():
 
     args = parser.parse_args()
 
-    input_ome_zarr_filepath = args.input_ome_zarr_filepath
-    input_transforms_filepath = args.input_transforms_filepath
+    input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
+    input_transforms_filepath = os.path.abspath(args.input_transforms_filepath)
     mem = args.mem
     runtime = args.runtime
 
