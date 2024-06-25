@@ -39,10 +39,11 @@ rule apply_final_transformations:
 
 
 def _get_target_stack_shape():
-    if run_info['no_autopad']:
-        return run_info['stack_shape']
-    stack_shape_json = run_info["input_transforms_filepaths"]
-    return f'{stack_shape_json}:meta:stack_shape'
+    # if run_info['no_autopad']:
+    #     return run_info['stack_shape']
+    # stack_shape_json = run_info["input_transforms_filepaths"]
+    # return f'{stack_shape_json}:meta:stack_shape'
+    return run_info['stack_shape']
 
 
 rule create_ome_zarr:
