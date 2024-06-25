@@ -91,6 +91,7 @@ if __name__ == '__main__':
         key='s0',
         auto_pad=False,
         z_range=z_range,
+        start_transform_id=z_range[0],
         n_workers=n_threads,
         quiet=False,
         verbose=verbose
