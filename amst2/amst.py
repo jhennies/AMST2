@@ -23,10 +23,16 @@ def snk_amst():
 
     parser.add_argument('input_ome_zarr_filepath', type=str,
                         help='Input ome zarr filepath')
+    parser.add_argument('--transform', type=str, default='affine',
+                        help='Transform to use for registration; values=["affine", "bspline"]; default="affine"')
     parser.add_argument('--auto_mask_off', action='store_true',
                         help='Generates a mask using image > 0')
-    parser.add_argument('-mr', '--median_radius', type=int, default=3,
-                        help='Median smoothing of offsets when combining local and TM')
+    parser.add_argument('-mr', '--median_radius', type=int, default=7,
+                        help='Size of median filter for z-median-smoothing step; default=7')
+    parser.add_argument('-gs', '--gaussian_sigma', type=float, default=0.,
+                        help='Gaussian smoothing before computing registration')
+    parser.add_argument('--elastix_parameter_file', type=str, default=None,
+                        help='Optionally, supply a parameter file for the registration step; default=None')
     parser.add_argument('--no_previews', action='store_true',
                         help='No preview outputs are generated for the alignement steps')
     parser.add_argument('--preview_downsample_level', type=int, default=2,
@@ -40,10 +46,14 @@ def snk_amst():
     args = parser.parse_args()
 
     input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
+    transform = args.transform
     auto_mask_off = args.auto_mask_off
     median_radius = args.median_radius
+    gaussian_sigma = args.gaussian_sigma
     no_previews = args.no_previews
     preview_downsample_level = args.preview_downsample_level
+
+    assert transform in ['affine', 'bspline'], f'Invalid transform: {transform}'
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -88,8 +98,10 @@ def snk_amst():
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
         input_key='s0',
+        transform=transform,
         auto_mask_off=auto_mask_off,
         median_radius=median_radius,
+        gaussian_sigma=gaussian_sigma,
         no_previews=no_previews,
         batch_ids=batch_ids,
         stack_shape=shape_h,
@@ -113,7 +125,7 @@ def snk_amst():
 
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
-    sn_args.snakefile = Path(os.path.join(src_dirpath, 'snakemake_workflows/amst.snk'))
+    sn_args.snakefile = Path(os.path.join(src_dirpath, f'snakemake_workflows/amst_{transform}.snk'))
     sn_args.set_threads = dict(
         amst=min(args.batch_size, args.cores, args.max_cores_per_task)
     )

@@ -285,6 +285,7 @@ def snk_elastix_stack_alignment():
     from squirrel.library.ome_zarr import (
         get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset
     )
+    print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
     data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
     batch_ids = [x for x in range(0, shape_h[0], common_args['batch_size'])]
     ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
@@ -393,8 +394,10 @@ def snk_apply_transformation():
 
     parser.add_argument('input_ome_zarr_filepath', type=str,
                         help='Input ome zarr filepath')
-    parser.add_argument('input_transforms_filepath', type=str,
-                        help='Filepath to transformations file (*.json)')
+    parser.add_argument('input_transforms_filepaths', type=str, nargs='+',
+                        help='Filepaths to transformations file (*.json) or directory')
+    parser.add_argument('--no_autopad', action='store_true',
+                        help='Switches off auto-padding')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -412,7 +415,8 @@ def snk_apply_transformation():
     args = parser.parse_args()
 
     input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
-    input_transforms_filepath = os.path.abspath(args.input_transforms_filepath)
+    input_transforms_filepaths = [os.path.abspath(x) for x in args.input_transforms_filepaths]
+    no_autopad = args.no_autopad
     mem = args.mem
     runtime = args.runtime
 
@@ -420,7 +424,7 @@ def snk_apply_transformation():
     output_location_args = output_locations_to_dict(
         args,
         workflow_name='apply_transforms',
-        fallback_output_name=f'{os.path.splitext(os.path.split(input_transforms_filepath)[1])[0]}.ome.zarr'
+        fallback_output_name=f'{os.path.splitext(os.path.split(input_transforms_filepaths[0])[1])[0]}.ome.zarr'
     )
     ome_zarr_args = args_to_dict(args, ome_zarr_fields)
 
@@ -452,13 +456,14 @@ def snk_apply_transformation():
 
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
-        input_transforms_filepath=input_transforms_filepath,
+        input_transforms_filepaths=input_transforms_filepaths,
         batch_ids=batch_ids,
         stack_shape=shape_h,
         src_dirpath=src_dirpath,
         output_dtype=dtype,
         resolution=resolution,
         unit=unit,
+        no_autopad=no_autopad,
         **output_location_args,
         **common_args,
         **ome_zarr_args

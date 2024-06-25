@@ -28,7 +28,7 @@ rule all:
 rule apply_final_transformations:
     input:
         run_info["output_ome_zarr_filepath"],
-        run_info["input_transforms_filepath"]
+        run_info["input_transforms_filepaths"]
     output:
         os.path.join(this_cache_dirpath, "apply_final_transformations_{idx}.done")
     params:
@@ -39,7 +39,9 @@ rule apply_final_transformations:
 
 
 def _get_target_stack_shape():
-    stack_shape_json = run_info["input_transforms_filepath"]
+    if run_info['no_autopad']:
+        return run_info['stack_shape']
+    stack_shape_json = run_info["input_transforms_filepaths"]
     return f'{stack_shape_json}:meta:stack_shape'
 
 

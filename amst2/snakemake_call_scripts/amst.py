@@ -22,9 +22,10 @@ if __name__ == '__main__':
         run_info['input_ome_zarr_filepath'],
         output,
         pre_align_key=run_info['input_key'],
-        transform='affine',
+        transform=run_info['transform'],
         auto_mask_off=run_info['auto_mask_off'],
         median_radius=run_info['median_radius'],
+        gaussian_sigma=run_info['gaussian_sigma'],
         z_range=z_range,
         quiet=False,
         verbose=verbose
