@@ -50,15 +50,9 @@ rule compute_auto_pad:
         'some_output_file'
 
 
-def _amst_output():
-    if transform == 'bspline':
-        return directory(os.path.join(this_cache_dirpath, "amst_{idx}"))
-    return os.path.join(this_cache_dirpath, "amst_{idx}.json")
-
-
 rule amst_preview:
     input:
-        expand(_amst_output, idx=batch_ids)
+        expand(os.path.join(this_cache_dirpath, "amst_{idx}.json"), idx=batch_ids)
     output:
         os.path.join(meta_dirpath, "amst_preview.h5"),
         os.path.join(meta_dirpath, "amst.json")
@@ -73,7 +67,7 @@ rule amst_preview:
 
 rule amst:
     output:
-        _amst_output()
+        os.path.join(this_cache_dirpath, "amst_{idx}.json")
     params:
         run_info=run_info
     script:
