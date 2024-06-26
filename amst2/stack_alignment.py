@@ -222,6 +222,8 @@ def snk_elastix_stack_alignment():
                         help='Perform a gaussian smoothing before registration')
     parser.add_argument('--z_step', type=int, default=1,
                         help='Uses only every nth data slice; good to determine long range correspondence; default=1')
+    parser.add_argument('--average_for_z_step', action='store_true',
+                        help='Use the average of n=z_step slices for fixed and moving images')
     parser.add_argument('--auto_pad', action='store_true',
                         help='Compute the information necessary for auto-padding and apply if requested')
     parser.add_argument('--determine_bounds', action='store_true',
@@ -256,6 +258,7 @@ def snk_elastix_stack_alignment():
     auto_mask = args.auto_mask
     gaussian_sigma = args.gaussian_sigma
     z_step = args.z_step
+    average_for_z_step = args.average_for_z_step
     auto_pad = args.auto_pad
     determine_bounds = args.determine_bounds
     apply_final = args.apply_final
@@ -319,11 +322,12 @@ def snk_elastix_stack_alignment():
         meta_dirpath=meta_dirpath,
         auto_pad=auto_pad,
         determine_bounds=determine_bounds,
-        apply_final = apply_final,
+        apply_final=apply_final,
         elastix_stack_alignment_workflow_params=dict(
             auto_mask=auto_mask,
             gaussian_sigma=gaussian_sigma,
             z_step=z_step,
+            average_for_z_step=average_for_z_step,
             transform=transform,
             key='s0',
             pre_fix_big_jumps=not no_fixing_of_big_jumps,
