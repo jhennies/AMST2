@@ -220,6 +220,8 @@ def snk_elastix_stack_alignment():
                         help='Generates a mask using image > 0')
     parser.add_argument('--gaussian_sigma', type=float, default=0.,
                         help='Perform a gaussian smoothing before registration')
+    parser.add_argument('--use_edges', action='store_true',
+                        help='Computes edges before registration using a sobel filter')
     parser.add_argument('--z_step', type=int, default=1,
                         help='Uses only every nth data slice; good to determine long range correspondence; default=1')
     parser.add_argument('--average_for_z_step', action='store_true',
@@ -259,6 +261,7 @@ def snk_elastix_stack_alignment():
     transform = args.transform
     auto_mask = args.auto_mask
     gaussian_sigma = args.gaussian_sigma
+    use_edges = args.use_edges
     z_step = args.z_step
     average_for_z_step = args.average_for_z_step
     auto_pad = args.auto_pad
@@ -329,6 +332,7 @@ def snk_elastix_stack_alignment():
         elastix_stack_alignment_workflow_params=dict(
             auto_mask=auto_mask,
             gaussian_sigma=gaussian_sigma,
+            use_edges=use_edges,
             z_step=z_step,
             average_for_z_step=average_for_z_step,
             transform=transform,
