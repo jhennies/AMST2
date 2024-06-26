@@ -266,7 +266,7 @@ def snk_elastix_stack_alignment():
     apply_final = args.apply_final
     no_preview = args.no_preview
     no_fixing_of_big_jumps = args.no_fixing_of_big_jumps
-    parameter_map = os.path.abspath(args.parameter_map)
+    parameter_map = os.path.abspath(args.parameter_map) if args.parameter_map is not None else None
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
