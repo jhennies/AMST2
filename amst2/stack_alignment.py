@@ -235,6 +235,8 @@ def snk_elastix_stack_alignment():
     parser.add_argument('--no_fixing_of_big_jumps', action='store_true',
                         help='Switches off usage of cross-correlation to fix big initial jumps\n'
                              'Only use this if you are sure that there are no big jumps in the input stack!')
+    parser.add_argument('--parameter_map', type=str, default=None,
+                        help='Elastix parameter map file')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -264,6 +266,7 @@ def snk_elastix_stack_alignment():
     apply_final = args.apply_final
     no_preview = args.no_preview
     no_fixing_of_big_jumps = args.no_fixing_of_big_jumps
+    parameter_map = args.parameter_map
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
@@ -329,6 +332,7 @@ def snk_elastix_stack_alignment():
             z_step=z_step,
             average_for_z_step=average_for_z_step,
             transform=transform,
+            parameter_map=parameter_map,
             key='s0',
             pre_fix_big_jumps=not no_fixing_of_big_jumps,
             pre_fix_iou_thresh=0.9
