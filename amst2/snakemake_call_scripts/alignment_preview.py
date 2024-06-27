@@ -28,11 +28,6 @@ if __name__ == '__main__':
     print(f'meta = {transforms.get_meta()}')
     print(f'len(transforms) = {len(transforms)}')
 
-    if save_joined_transforms:
-        transforms.to_file(transforms_filepath)
-
-    transforms = transforms.get_sequenced_stack()
-
     # Downsample the transformations
     from squirrel.library.ome_zarr import get_ome_zarr_handle, get_scale_of_downsample_level
 
@@ -51,6 +46,7 @@ if __name__ == '__main__':
     # Perform auto-pad
     stack_shape = None
     if compute_auto_pad:
+        transforms = transforms.get_sequenced_stack()
         from squirrel.library.image import apply_auto_pad
         transforms, stack_shape = apply_auto_pad(
             transforms,
@@ -75,6 +71,9 @@ if __name__ == '__main__':
         transforms = transforms.apply_z_step()
     print(f'len(transforms) = {len(transforms)}')
     print(f'meta = {transforms.get_meta()}')
+
+    if save_joined_transforms:
+        transforms.to_file(transforms_filepath)
 
     # Scale the transformations
     transforms = transforms.get_scaled(scale)
