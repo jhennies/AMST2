@@ -41,7 +41,7 @@ if __name__ == '__main__':
         print(f'scale = {scale}')
     # if not transforms.is_sequenced:
     #     transforms = transforms.get_sequenced_stack()
-    assert transforms.is_sequenced
+    # assert transforms.is_sequenced
 
     # Perform auto-pad
     stack_shape = None
