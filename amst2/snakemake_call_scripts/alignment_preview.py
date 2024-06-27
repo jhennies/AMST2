@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
     transforms = load_affine_stack_from_multiple_files(input, sequence_stack=False)
+    transforms = transforms.get_sequenced_stack()
     print(f'meta = {transforms.get_meta()}')
     print(f'len(transforms) = {len(transforms)}')
 
@@ -41,12 +42,11 @@ if __name__ == '__main__':
         print(f'scale = {scale}')
     # if not transforms.is_sequenced:
     #     transforms = transforms.get_sequenced_stack()
-    # assert transforms.is_sequenced
+    assert transforms.is_sequenced
 
     # Perform auto-pad
     stack_shape = None
     if compute_auto_pad:
-        transforms = transforms.get_sequenced_stack()
         from squirrel.library.image import apply_auto_pad
         transforms, stack_shape = apply_auto_pad(
             transforms,
@@ -76,8 +76,6 @@ if __name__ == '__main__':
         transforms.to_file(transforms_filepath)
 
     # Scale the transformations
-    if not transforms.is_sequenced:
-        transforms = transforms.get_sequenced_stack()
     transforms = transforms.get_scaled(scale)
 
     print(f'stack_shape = {stack_shape}')
