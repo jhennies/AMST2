@@ -76,6 +76,8 @@ if __name__ == '__main__':
         transforms.to_file(transforms_filepath)
 
     # Scale the transformations
+    if not transforms.is_sequenced:
+        transforms = transforms.get_sequenced_stack()
     transforms = transforms.get_scaled(scale)
 
     print(f'stack_shape = {stack_shape}')
