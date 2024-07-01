@@ -458,11 +458,12 @@ def snk_apply_transformation():
         if os.path.isdir(input_transforms_filepath):
             from squirrel.library.elastix import ElastixStack
             this_stack = ElastixStack(dirpath=input_transforms_filepath)
-            shapes.append(this_stack.image_shape())
+            if this_stack.image_shape() is not None:
+                shapes.append(this_stack.image_shape())
         else:
             from squirrel.library.affine_matrices import AffineStack
             this_stack = AffineStack(filepath=input_transforms_filepath)
-            if this_stack.exists_meta('stack_shape'):
+            if this_stack.exists_meta('stack_shape') and this_stack.get_meta('stack_shape') is not None:
                 shapes.append(this_stack.get_meta('stack_shape')[1:])
     if len(shapes) > 0:
         import numpy as np
