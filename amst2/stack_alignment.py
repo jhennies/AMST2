@@ -464,10 +464,13 @@ def snk_apply_transformation():
             this_stack = AffineStack(filepath=input_transforms_filepath)
             if this_stack.exists_meta('stack_shape'):
                 shapes.append(this_stack.get_meta('stack_shape')[1:])
-    import numpy as np
-    shapes = np.array(shapes)
-    assert np.all(shapes == shapes[0], axis=0).all(), 'Only allowed for transform stacks with equal image shapes'
-    stack_shape = np.array([shape_h[0], shapes[0][0], shapes[0][1]]).tolist()
+    if len(shapes) > 0:
+        import numpy as np
+        shapes = np.array(shapes)
+        assert np.all(shapes == shapes[0], axis=0).all(), 'Only allowed for transform stacks with equal image shapes'
+        stack_shape = np.array([shape_h[0], shapes[0][0], shapes[0][1]]).tolist()
+    else:
+        stack_shape = shape_h
 
     assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
     assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
