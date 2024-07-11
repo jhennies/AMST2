@@ -35,6 +35,14 @@ def snk_amst():
                         help='Optionally, supply a parameter file for the registration step; default=None')
     parser.add_argument('--no_previews', action='store_true',
                         help='No preview outputs are generated for the alignement steps')
+    parser.add_argument('--mem', type=str, nargs='+', default=None,
+                        help='Cluster job memory amounts for the snakemake rules.\n'
+                             'For each rule define like so:\n'
+                             '"rule_name:16000"')
+    parser.add_argument('--runtime', type=str, nargs='+', default=None,
+                        help='Cluster job runtimes for the snakemake rules. \n'
+                             'For each rule define like so:\n'
+                             '"rule_name:30"')
     parser.add_argument('--preview_downsample_level', type=int, default=2,
                         help='Downsample level of preview volumes; default=2')
 
@@ -52,6 +60,8 @@ def snk_amst():
     gaussian_sigma = args.gaussian_sigma
     no_previews = args.no_previews
     preview_downsample_level = args.preview_downsample_level
+    mem = args.mem
+    runtime = args.runtime
 
     assert transform in ['affine', 'bspline'], f'Invalid transform: {transform}'
 
@@ -133,16 +143,18 @@ def snk_amst():
     if args.cluster is not None:
 
         from amst2.cluster.slurm import get_cluster_settings
+        from amst2.cluster.general import set_resources
 
-        sn_args.set_resources = dict(
-            amst=dict(
-                mem_mb=24000,
-                runtime=30
-            ),
-            amst_preview=dict(
-                mem_mb=8000,
-                runtime=30
-            )
+        set_resources(
+            sn_args,
+            [
+                'amst',
+                'amst_preview'
+            ],
+            [24000, 8000],
+            [30, 30],
+            mem_args=mem,
+            runtime_args=runtime
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
