@@ -26,6 +26,7 @@ if __name__ == '__main__':
         auto_mask_off=run_info['auto_mask_off'],
         median_radius=run_info['median_radius'],
         gaussian_sigma=run_info['gaussian_sigma'],
+        elastix_parameters=run_info['elastix_parameter_file'],
         z_range=z_range,
         quiet=False,
         verbose=verbose

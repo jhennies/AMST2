@@ -58,6 +58,7 @@ def snk_amst():
     auto_mask_off = args.auto_mask_off
     median_radius = args.median_radius
     gaussian_sigma = args.gaussian_sigma
+    elastix_parameter_file = args.elastix_parameter_file
     no_previews = args.no_previews
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
@@ -112,6 +113,7 @@ def snk_amst():
         auto_mask_off=auto_mask_off,
         median_radius=median_radius,
         gaussian_sigma=gaussian_sigma,
+        elastix_parameter_file=elastix_parameter_file,
         no_previews=no_previews,
         batch_ids=batch_ids,
         stack_shape=shape_h,
