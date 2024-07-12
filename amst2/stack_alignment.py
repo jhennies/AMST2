@@ -129,7 +129,7 @@ def snk_default_amst_pre_alignment():
         resolution=resolution,
         unit=unit,
         meta_dirpath=meta_dirpath,
-        local_alignment_params=dict(
+        elastix_stack_alignment_workflow_params=dict(
             auto_mask=local_auto_mask,
             gaussian_sigma=local_gaussian_sigma,
             transform='translation',
