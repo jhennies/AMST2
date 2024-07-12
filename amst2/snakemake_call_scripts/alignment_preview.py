@@ -4,7 +4,7 @@ if __name__ == '__main__':
     input = snakemake.input
     output = snakemake.output[0]
     transforms_filepath = None
-    if len(output) > 1:
+    if len(snakemake.output) > 1:
         transforms_filepath = snakemake.output[1]
     run_info = snakemake.params['run_info']
     n_threads = snakemake.threads
