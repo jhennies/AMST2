@@ -103,7 +103,7 @@ if __name__ == '__main__':
     print(f'output dataset shape = {get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape}')
     print(f'input dataset shape = {get_ome_zarr_handle(input_ome_zarr_filepath, mode="r")["s0"].shape}')
     from squirrel.library.volume import pad_volume
-    result_stack = pad_volume(result_stack, get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape)
+    result_stack = pad_volume(result_stack, get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape, axes=[1, 2])
     print(f'output dataset shape (adjusted) = {get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape}')
     from squirrel.library.ome_zarr import chunk_to_ome_zarr
     chunk_to_ome_zarr(
