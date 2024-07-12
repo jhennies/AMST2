@@ -48,7 +48,7 @@ rule apply_final_transformations:
 
 
 def _get_target_stack_shape():
-    stack_shape_json = os.path.join(meta_dirpath, "elastix.json")
+    stack_shape_json = os.path.join(meta_dirpath, "template_matching.json")
     return f'{stack_shape_json}:meta:stack_shape'
 
 
