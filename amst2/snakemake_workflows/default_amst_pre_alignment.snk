@@ -115,7 +115,9 @@ rule template_matching_preview:
     output:
         os.path.join(meta_dirpath, "template_matching_preview.h5")
     params:
-        run_info=run_info
+        run_info=run_info,
+        save_joined_transforms=False,
+        compute_auto_pad=False
     threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "alignment_preview.py")
@@ -139,7 +141,9 @@ rule local_alignment_preview:
     output:
         os.path.join(meta_dirpath, "local_preview.h5")
     params:
-        run_info=run_info
+        run_info=run_info,
+        save_joined_transforms=False,
+        compute_auto_pad=False
     threads: 1
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "alignment_preview.py")
