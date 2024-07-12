@@ -25,7 +25,8 @@ if __name__ == '__main__':
 
     from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
     transforms = load_affine_stack_from_multiple_files(input, sequence_stack=False)
-    transforms = transforms.get_sequenced_stack()
+    if not transforms.is_sequenced:
+        transforms = transforms.get_sequenced_stack()
     print(f'meta = {transforms.get_meta()}')
     print(f'len(transforms) = {len(transforms)}')
 
