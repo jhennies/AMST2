@@ -95,7 +95,7 @@ rule template_matching:
     params:
         run_info=run_info,
         template_matching_stack_alignment_workflow_params=run_info['template_matching_params'],
-        determine_bounds=True
+        determine_bounds=determine_bounds
     threads: min(run_info['batch_size'], run_info['cores'], run_info['max_cores_per_task'])
     script:
         os.path.join(src_dirpath, "snakemake_call_scripts", "template_matching_stack_alignment.py")
