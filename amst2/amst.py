@@ -58,7 +58,7 @@ def snk_amst():
     auto_mask_off = args.auto_mask_off
     median_radius = args.median_radius
     gaussian_sigma = args.gaussian_sigma
-    elastix_parameter_file = os.path.abspath(args.elastix_parameter_file)
+    elastix_parameter_file = os.path.abspath(args.elastix_parameter_file) if args.elastix_parameter_file is not None else None
     no_previews = args.no_previews
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
