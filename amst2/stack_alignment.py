@@ -699,7 +699,7 @@ def snk_template_matching_stack_alignment():
             sn_args,
             [
                 'template_matching',
-                'alignment_preview',
+                'template_matching_preview',
                 'create_ome_zarr',
                 'apply_final_transformations'
             ],
