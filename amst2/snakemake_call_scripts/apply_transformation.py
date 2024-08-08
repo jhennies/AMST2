@@ -85,6 +85,8 @@ if __name__ == '__main__':
 
     from squirrel.workflows.elastix import apply_multi_step_stack_alignment_workflow
 
+    from squirrel.library.ome_zarr import get_ome_zarr_handle
+
     result_stack = apply_multi_step_stack_alignment_workflow(
         input_ome_zarr_filepath,
         transformations_filepath,
@@ -93,11 +95,10 @@ if __name__ == '__main__':
         z_range=z_range,
         start_transform_id=z_range[0],
         n_workers=1,  # This is using elastix which is parallelized internally!
+        target_image_shape=get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape,
         quiet=False,
         verbose=verbose
     )
-
-    from squirrel.library.ome_zarr import get_ome_zarr_handle
 
     print(f'result_stack.shape = {result_stack.shape}')
     print(f'output dataset shape = {get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape}')
