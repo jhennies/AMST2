@@ -95,7 +95,6 @@ if __name__ == '__main__':
         z_range=z_range,
         start_transform_id=z_range[0],
         n_workers=1,  # This is using elastix which is parallelized internally!
-        target_image_shape=get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape,
         quiet=False,
         verbose=verbose
     )
