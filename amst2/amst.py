@@ -151,7 +151,7 @@ def snk_amst():
             sn_args,
             [
                 'amst',
-                'amst_preview'
+                'join_transformations' if transform == 'bspline' else 'amst_preview'
             ],
             [24000, 8000],
             [30, 30],
@@ -160,7 +160,6 @@ def snk_amst():
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
-        print(sn_args)
 
     args_to_api(sn_args, parser)
 
