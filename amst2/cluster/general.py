@@ -17,6 +17,8 @@ def set_resources(
     mem_dict = _split_args(mem_args)
     runtime_dict = _split_args(runtime_args)
 
+    print(f'mem_dict = {mem_dict}')
+
     sn_args.set_resources = {
         rule_name: dict(
             mem_mb=mem_defaults[idx] if rule_name not in mem_dict else mem_dict[rule_name],
