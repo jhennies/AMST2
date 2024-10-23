@@ -160,6 +160,7 @@ def snk_amst():
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        print(sn_args)
 
     args_to_api(sn_args, parser)
 
