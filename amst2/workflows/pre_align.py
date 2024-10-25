@@ -79,20 +79,6 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
             verbose=verbose
         )
 
-    # # Optional: convert the result back to a tif stack
-    # snk_ome_zarr_to_stack \
-    #   ./combined_alignment_autopad.ome.zarr \
-    #   . \
-    #   combined_alignment_autopad \
-    #   --cluster slurm \
-    #   --cores 4000 \
-    #   --batch_size 32 \
-    #   --max_cores_per_task 32
-    #
-    # # To generate reslice figure
-    # crop_from_stack combined_alignment_autopad.ome.zarr combined_alignment_autopad-crop_x1880w32.h5 --key s0 --roi 0 0 1880 800 1604 32
-
-
 
 def nsbs_pre_align():
 
