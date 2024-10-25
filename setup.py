@@ -20,7 +20,8 @@ setup(
             'snk_elastix_stack_alignment = amst2.stack_alignment:snk_elastix_stack_alignment',
             'snk_template_matching_stack_alignment = amst2.stack_alignment:snk_template_matching_stack_alignment',
             'snk_apply_transformation = amst2.stack_alignment:snk_apply_transformation',
-            'snk_normalize_stack = amst2.stack_operations:snk_normalize_stack'
+            'snk_normalize_stack = amst2.stack_operations:snk_normalize_stack',
+            'amst-nsbs-pre-align = amst2.workflows.pre_align:nsbs_pre_align'
         ]
     },
     install_requires=[
