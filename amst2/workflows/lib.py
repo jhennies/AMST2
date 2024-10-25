@@ -101,24 +101,42 @@ def run_stack_to_ome_zarr(
     mem_str = get_resource_str(this_param_dict, 'mem')
     runtime_str = get_resource_str(this_param_dict, 'runtime')
 
-    run_script = (
-        "snk_stack_to_ome_zarr "
-        f"{this_param_dict['input_dirpath']} "
-        f"{output_dirpath} "
-        f"-out-oz-fn input-raw.ome.zarr' "
-        f"--resolution {' '.join([str(x) for x in this_param_dict['resolution']])} "
-        f"--unit {this_param_dict['unit']} "
-        f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
-        f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
-        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
-        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
-        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
-        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
-        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
-        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
-        f"{'-v' if verbose else ''} "
+    # run_script = (
+    #     "snk_stack_to_ome_zarr "
+    #     f"{this_param_dict['input_dirpath']} "
+    #     f"{output_dirpath} "
+    #     f"-out-oz-fn input-raw.ome.zarr' "
+    #     f"--resolution {' '.join([str(x) for x in this_param_dict['resolution']])} "
+    #     f"--unit {this_param_dict['unit']} "
+    #     f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
+    #     f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
+    #     f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
+    #     f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
+    #     f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
+    #     f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
+    #     f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
+    #     f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
+    #     f"{'-v' if verbose else ''} "
+    #     "--continue_run"
+    # )
+    run_script = [
+        "snk_stack_to_ome_zarr ",
+        f"{this_param_dict['input_dirpath']} ",
+        f"{output_dirpath} ",
+        f"-out-oz-fn input-raw.ome.zarr' ",
+        f"--resolution {' '.join([str(x) for x in this_param_dict['resolution']])} ",
+        f"--unit {this_param_dict['unit']} ",
+        f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} ",
+        f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} ",
+        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} ",
+        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} ",
+        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} ",
+        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} ",
+        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} ",
+        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} ",
+        f"{'-v' if verbose else ''} ",
         "--continue_run"
-    )
+    ]
 
     print(run_script)
 
