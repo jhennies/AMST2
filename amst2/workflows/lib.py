@@ -55,7 +55,6 @@ def get_parameters_for_snakemake_workflow(parameter_dict, parameter_key, verbose
             print(f'k = {k}; v = {v}')
         this_dict[k] = v
 
-    print(f'this_dict = {this_dict}')
     return this_dict
 
 
