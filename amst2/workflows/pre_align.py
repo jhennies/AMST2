@@ -28,7 +28,7 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     from .lib import run_nsbs_alignment
     run_nsbs_alignment(
         parameter_dict, parameter_key='nsbs_alignment',
-        input_dirpath=os.path.join(output_dirpath, 'sbs_alignment/nsbs-step-1.ome.zarr'),
+        input_dirpath=os.path.join(output_dirpath, 'sbs_alignment/sbs.ome.zarr'),
         verbose=verbose
     )
 
@@ -38,18 +38,18 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     from squirrel.workflows.transformation import dot_product_on_affines_workflow
     dot_product_on_affines_workflow(
         [
-            os.path.join(output_dirpath, 'sbs_alignment/nsbs-step-1.meta/elastix.json'),
-            os.path.join(output_dirpath, 'nsbs_alignment/nsbs-step-n.meta/elastix.json')
+            os.path.join(output_dirpath, 'sbs_alignment/sbs.meta/elastix.json'),
+            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/elastix.json')
         ],
-        os.path.join(output_dirpath, 'nsbs_alignment/nsbs-step-n.meta/combined.json'),
+        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
         keep_meta=0,
         verbose=verbose
     )
-    if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment/nsbs-step-n.meta/combined.json')):
+    if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json')):
         return
     from squirrel.workflows.transformation import apply_auto_pad_workflow
     apply_auto_pad_workflow(
-        os.path.join(output_dirpath, 'nsbs_alignment/nsbs-step-n.meta/combined.json'),
+        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
         os.path.join(output_dirpath, 'nsbs-pre-align.json'),
         verbose=verbose
     )
