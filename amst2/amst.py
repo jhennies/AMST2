@@ -29,6 +29,9 @@ def snk_amst():
                         help='Generates a mask using image > 0')
     parser.add_argument('-mr', '--median_radius', type=int, default=7,
                         help='Size of median filter for z-median-smoothing step; default=7')
+    parser.add_argument('-zm', '--z_smooth_method', type=str, default='median',
+                        help='Method used for z-smoothing to generate the template; default="median"; '
+                             'values=["median", "gaussian"]')
     parser.add_argument('-gs', '--gaussian_sigma', type=float, default=0.,
                         help='Gaussian smoothing before computing registration')
     parser.add_argument('--elastix_parameter_file', type=str, default=None,
@@ -57,6 +60,7 @@ def snk_amst():
     transform = args.transform
     auto_mask_off = args.auto_mask_off
     median_radius = args.median_radius
+    z_smooth_method = args.z_smooth_method
     gaussian_sigma = args.gaussian_sigma
     elastix_parameter_file = os.path.abspath(args.elastix_parameter_file) if args.elastix_parameter_file is not None else None
     no_previews = args.no_previews
@@ -112,6 +116,7 @@ def snk_amst():
         transform=transform,
         auto_mask_off=auto_mask_off,
         median_radius=median_radius,
+        z_smooth_method=z_smooth_method,
         gaussian_sigma=gaussian_sigma,
         elastix_parameter_file=elastix_parameter_file,
         no_previews=no_previews,
