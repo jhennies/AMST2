@@ -1,0 +1,28 @@
+# This is an example parameter file for the AMST workflow
+# Copy this parameter file to your desired location and adjust to your needs
+# Then run the workflow using:
+#    amst-run /path/to/my/params-nsbs-pre-align.yaml
+
+general:
+  input_dirpath: /path/to/the/raw-data.ome.zarr
+  pre_align_dirpath: /path/to/your/pre-alignment.ome.zarr
+  pre_align_transforms: /path/to/pre-alignment-transforms.json
+  output_dirpath: /path/to/target/directory
+  cluster: slurm
+  batch_size: 32
+  cores: 2048
+  max_cores_per_task: 32
+
+amst:
+  elastix_parameter_file: auto
+  transform: bspline
+  median_radius: 7
+  gaussian_sigma: 2.0
+  auto_mask_off: false
+
+apply_amst:
+  mem:
+    apply_final_transform: 16000
+
+amst_to_tif_stack:
+  active: true

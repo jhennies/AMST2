@@ -59,22 +59,22 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     from .lib import run_apply_transformation
     run_apply_transformation(
         parameter_dict,
-        parameter_key='apply_transformation',
+        parameter_key='apply_pre_align',
         transforms_filepath=os.path.join(output_dirpath, 'nsbs-pre-align.json'),
         input_dirpath=os.path.join(output_dirpath, 'stack_to_ome_zarr/input-raw.ome.zarr'),
         output_filename='nsbs-pre-align.ome.zarr',
         verbose=verbose
     )
 
-    if not os.path.exists(os.path.join(output_dirpath, 'apply_transformation', 'apply_transformation.done')):
+    if not os.path.exists(os.path.join(output_dirpath, 'apply_pre_align', 'apply_pre_align.done')):
         return
 
-    if 'result_to_tif_stack' in parameter_dict and parameter_dict['result_to_tif_stack']['active']:
+    if 'pre_align_to_tif_stack' in parameter_dict and parameter_dict['pre_align_to_tif_stack']['active']:
         from .lib import run_ome_zarr_to_stack
         run_ome_zarr_to_stack(
             parameter_dict,
-            parameter_key='result_to_tif_stack',
-            input_dirpath=os.path.join(output_dirpath, 'apply_transformation/nsbs-pre-align.ome.zarr'),
+            parameter_key='pre_align_to_tif_stack',
+            input_dirpath=os.path.join(output_dirpath, 'apply_pre_align/nsbs-pre-align.ome.zarr'),
             output_dirname='nsbs-pre-align',
             verbose=verbose
         )

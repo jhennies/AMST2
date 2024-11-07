@@ -81,7 +81,7 @@ def get_resource_str(parameter_dict, resource_name='mem'):
 
 def run_stack_to_ome_zarr(
         parameter_dict,
-        parameter_key = 'stack_to_ome_zarr',
+        parameter_key='stack_to_ome_zarr',
         verbose=False
 ):
 
@@ -209,8 +209,23 @@ def run_apply_transformation(
     mem_str = get_resource_str(this_param_dict, 'mem')
     runtime_str = get_resource_str(this_param_dict, 'runtime')
 
-    if input_dirpath is None:
-        input_dirpath = f"{this_param_dict['input_dirpath']} "
+    # if input_dirpath is None:
+    #     input_dirpath = f"{this_param_dict['input_dirpath']} "
+
+    if verbose:
+        print(f'checking input dirpath for applying transformation ...')
+        print(this_param_dict)
+    if 'input_dirpath' in this_param_dict:
+        from squirrel.library.io import get_filetype
+        if get_filetype(this_param_dict['input_dirpath']) == 'ome_zarr':
+            input_dirpath = this_param_dict['input_dirpath']
+        else:
+            if verbose:
+                print(f"filetype of input_dirpath is {get_filetype(this_param_dict['input_dirpath'])}")
+                print(f"  ... using '{input_dirpath}' instead")
+
+    if type(transforms_filepath) == list or type(transforms_filepath) == tuple:
+        transforms_filepath = ' '.join(transforms_filepath)
 
     run_script = (
         "snk_apply_transformation "
@@ -282,3 +297,76 @@ def run_ome_zarr_to_stack(
 
     if not error:
         open(done_fp, 'w').close()
+
+
+def run_amst(
+        parameter_dict,
+        parameter_key,
+        pre_align_dirpath=None,
+        verbose=False
+):
+
+    this_param_dict = get_parameters_for_snakemake_workflow(parameter_dict, parameter_key, verbose=verbose)
+    if verbose:
+        print(f'parameter_key = {parameter_key}')
+        print(f'parameter_dict = {parameter_dict}')
+        print(f'this_param_dict = {this_param_dict}')
+    output_dirpath = os.path.join(this_param_dict['output_dirpath'], parameter_key)
+    if not os.path.exists(output_dirpath):
+        os.mkdir(output_dirpath)
+
+    done_fp = os.path.join(output_dirpath, f'{parameter_key}.done')
+    if os.path.exists(done_fp):
+        print('_____________________________________________\n')
+        print(f'{parameter_key} already computed!')
+        print('_____________________________________________\n')
+        return
+
+    if 'elastix_parameter_file' not in this_param_dict or this_param_dict['elastix_parameter_file'] == 'auto':
+        from squirrel.workflows.elastix import make_elastix_default_parameter_file_workflow
+        make_elastix_default_parameter_file_workflow(
+            os.path.join(output_dirpath, 'amst-elastix-params.txt'),
+            transform=this_param_dict['transform'],
+            elastix_parameters=[
+                'FinalGridSpacingInPhysicalUnits:256',
+                'GridSpacingSchedule:4.0,3.0,2.0,1.0',
+                'MaximumStepLength:0.5',
+                'MaximumNumberOfIterations:1024'
+            ],
+            verbose=verbose
+        )
+        this_param_dict['elastix_parameter_file'] = os.path.join(output_dirpath, 'amst-elastix-params.txt')
+    assert os.path.exists(this_param_dict['elastix_parameter_file']), "Elastix parameter file not found!"
+
+    mem_str = get_resource_str(this_param_dict, 'mem')
+    runtime_str = get_resource_str(this_param_dict, 'runtime')
+
+    pre_align_dirpath = this_param_dict['pre_align_dirpath'] if 'pre_align_dirpath' in this_param_dict else pre_align_dirpath
+
+    run_script = (
+        "snk_amst "
+        f"{pre_align_dirpath} "
+        f"{output_dirpath} "
+        f"--transform {this_param_dict['transform']} "
+        f"--elastix_parameter_file {this_param_dict['elastix_parameter_file']} "
+        f"-mr {this_param_dict['median_radius']} "
+        f"-gs {this_param_dict['gaussian_sigma']} "
+        f"-out-oz-fn amst.ome.zarr "
+        f"{'--auto_mask_off' if 'auto_mask_off' in this_param_dict and this_param_dict['auto_mask_off'] else ''} "
+        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
+        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
+        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
+        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
+        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
+        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
+        f"{'-v' if verbose else ''} "
+        "--continue_run"
+    )
+
+    print(run_script)
+
+    error = run_snakemake_workflow(run_script, parameter_key)
+
+    if not error:
+        open(done_fp, 'w').close()
+

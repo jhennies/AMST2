@@ -45,14 +45,14 @@ nsbs_alignment:
     elastix_stack_alignment: 16000
     apply_final_transform: 16000
 
-apply_transformation:
+apply_pre_align:
   cores: 2048
   batch_size: 32
   max_cores_per_task: 32
   mem:
     apply_final_transform: 16000
 
-result_to_tif_stack:
+pre_align_to_tif_stack:
   active: true
   cores: 2048
   batch_size: 32
