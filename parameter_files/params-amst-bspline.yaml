@@ -1,12 +1,14 @@
 # This is an example parameter file for the AMST workflow
 # Copy this parameter file to your desired location and adjust to your needs
 # Then run the workflow using:
-#    amst-run /path/to/my/params-nsbs-pre-align.yaml
+#    amst-run /path/to/my/params-amst-bspline.yaml
 
 general:
+  # These three can be omitted if AMST is run inside the same target folder as the pre-align >>>
   input_dirpath: /path/to/the/raw-data.ome.zarr  # Defaults to <output_dirpath>/stack_to_ome_zarr/input-raw.ome.zarr
   pre_align_dirpath: /path/to/your/pre-alignment.ome.zarr  # Defaults to <output_dirpath>/apply_pre_align/nsbs-pre-align.ome.zarr
   pre_align_transforms: /path/to/pre-alignment-transforms.json  # Defaults to <output_dirpath>/nsbs-pre-align.json
+  # <<<run
   output_dirpath: /path/to/target/directory
   cluster: slurm
   batch_size: 32
