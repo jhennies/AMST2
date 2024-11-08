@@ -4,9 +4,9 @@
 #    amst-run /path/to/my/params-nsbs-pre-align.yaml
 
 general:
-  input_dirpath: /path/to/the/raw-data.ome.zarr
-  pre_align_dirpath: /path/to/your/pre-alignment.ome.zarr
-  pre_align_transforms: /path/to/pre-alignment-transforms.json
+  input_dirpath: /path/to/the/raw-data.ome.zarr  # Defaults to <output_dirpath>/stack_to_ome_zarr/input-raw.ome.zarr
+  pre_align_dirpath: /path/to/your/pre-alignment.ome.zarr  # Defaults to <output_dirpath>/apply_pre_align/nsbs-pre-align.ome.zarr
+  pre_align_transforms: /path/to/pre-alignment-transforms.json  # Defaults to <output_dirpath>/nsbs-pre-align.json
   output_dirpath: /path/to/target/directory
   cluster: slurm
   batch_size: 32
