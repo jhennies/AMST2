@@ -22,7 +22,9 @@ setup(
             'snk_apply_transformation = amst2.stack_alignment:snk_apply_transformation',
             'snk_normalize_stack = amst2.stack_operations:snk_normalize_stack',
             'amst-nsbs-pre-align = amst2.workflows.pre_align:nsbs_pre_align',
-            'amst-run = amst2.workflows.amst:amst'
+            'amst-cleanup-nsbs-pre-align = amst2.workflows.pre_align:cleanup_nsbs_pre_align',
+            'amst-run = amst2.workflows.amst:amst',
+            'amst-cleanup-run = amst2.workflows.amst:cleanup_amst'
         ]
     },
     install_requires=[
