@@ -22,6 +22,7 @@ stack_to_ome_zarr:
 
 sbs_alignment:
   auto_mask: true
+  gaussian_sigma: 2.0
   preview_downsample_level: 2
   cores: 2048
   batch_size: 32
@@ -35,6 +36,7 @@ sbs_alignment:
 nsbs_alignment:
   z_step: 16  # Set to approximately 80 / z-spacing. (e.g., 80 / 5nm = 16)
   auto_mask: true
+  gaussian_sigma: 2.0
   preview_downsample_level: 2
   cores: 2048
   batch_size: 32
