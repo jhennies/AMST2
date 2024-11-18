@@ -162,7 +162,7 @@ def run_nsbs_alignment(
         f"{output_dirpath} "
         f"-out-oz-fn {'nsbs' if 'z_step' in this_param_dict and this_param_dict['z_step'] > 1 else 'sbs'}.ome.zarr "
         f"--z_step {this_param_dict['z_step'] if 'z_step' in this_param_dict else 1} "
-        f"-gs {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
+        f"--gaussian_sigma {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
         f"{'--apply_final' if 'apply_final' in this_param_dict and this_param_dict['apply_final'] else ''} "
         f"{'--auto_mask' if 'auto_mask' in this_param_dict and this_param_dict['auto_mask'] else ''} "
         f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
