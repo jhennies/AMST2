@@ -115,7 +115,7 @@ def snk_stack_to_ome_zarr():
                 'batch_to_ome_zarr',
                 'create_ome_zarr'
             ],
-            [16000, 1024],
+            [8000, 1024],
             [10, 5],
             mem_args=mem,
             runtime_args=runtime
