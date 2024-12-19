@@ -237,7 +237,7 @@ def snk_elastix_stack_alignment():
     parser.add_argument('--no_fixing_of_big_jumps', action='store_true',
                         help='Switches off usage of cross-correlation to fix big initial jumps\n'
                              'Only use this if you are sure that there are no big jumps in the input stack!')
-    parser.add_argument('--pre_fix_iou_thresh', type=float, defult=0.9,
+    parser.add_argument('--pre_fix_iou_thresh', type=float, default=0.9,
                         help='IoU-threshold below which the big jumps are pre-aligned using cross-correlation')
     parser.add_argument('--parameter_map', type=str, default=None,
                         help='Elastix parameter map file')
