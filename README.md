@@ -30,7 +30,7 @@ pip install -e AMST2
 pip install SimpleITK-SimpleElastix
 pip install transforms3d
 mamba install -c conda-forge opencv
-mamba install -c conda-forge zarr
+mamba install -c conda-forge zarr=2.18
 ```
 
 To use a slurm cluster:
@@ -40,8 +40,11 @@ pip install snakemake-executor-plugin-slurm
 
 ## Usage
 
- 1. Conversion to ome.zarr
- 2. Template matching alignment
- 3. Stack alignment with Simple Elastix
- 4. Pre-alignment by combining Template matching (step 3) and Elastix stack alignment (step 4)
- 5. Alignment to median smoothed template (AMST)
+To test the installation, we recommend using this dataset: https://www.ebi.ac.uk/empiar/EMPIAR-10311/
+
+You can select only the first 32 tif slices (slice_0000.tif to slice_0031.tif) for download to generate a suitable test dataset. 
+The examples were tested specifically with this fraction of the dataset, thus this should work properly.
+ 
+Check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
+
+
