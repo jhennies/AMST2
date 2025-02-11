@@ -42,7 +42,7 @@ pip install snakemake-executor-plugin-slurm
 
 To test the installation, we recommend using this dataset: https://www.ebi.ac.uk/empiar/EMPIAR-10311/
 
-You can select only the first 32 tif slices (slice_0000.tif to slice_0031.tif) for download to generate a suitable test dataset. 
+You can select only the first 32 tif slices (slice_0000.tif to slice_0031.tif) for download, in order to generate a suitable test dataset. 
 The examples were tested specifically with this fraction of the dataset, thus this should work properly.
  
 Check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
