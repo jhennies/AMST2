@@ -26,6 +26,7 @@ if __name__ == '__main__':
         name=run_info['name'],
         chunk_size=run_info['chunk_size'],
         z_range=z_range,
+        xy_range=run_info['crop_xy'],
         save_bounds=run_info['save_bounds'],
         append=True,
         n_threads=n_threads,

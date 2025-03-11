@@ -28,6 +28,9 @@ def snk_stack_to_ome_zarr():
                         help='Path within input h5 file; default="data"')
     parser.add_argument('--save_bounds', action='store_true',
                         help='Saves a json file alongside that contains the bounds of the non-zero area of each slice')
+    parser.add_argument('--crop_xy', type=int, nargs=4, default=None,
+                        metavar=('X', 'Y', 'W', 'H'),
+                        help='Crop an xy-region of the data before conversion')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -48,6 +51,7 @@ def snk_stack_to_ome_zarr():
     stack_pattern = args.stack_pattern
     stack_key = args.stack_key
     save_bounds = args.save_bounds
+    crop_xy = args.crop_xy
     mem = args.mem
     runtime = args.runtime
 
@@ -76,6 +80,8 @@ def snk_stack_to_ome_zarr():
     data_h, shape_h = load_data_handle(stack_path, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], args.batch_size)]
 
+    stack_shape = shape_h if crop_xy is None else [shape_h[0], crop_xy[3], crop_xy[2]]
+
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
     dtype = str(data_h[0].dtype)
 
@@ -84,8 +90,9 @@ def snk_stack_to_ome_zarr():
         stack_pattern=stack_pattern,
         stack_key=stack_key,
         save_bounds=save_bounds,
+        crop_xy=crop_xy,
         batch_ids=batch_ids,
-        stack_shape=shape_h,
+        stack_shape=stack_shape,
         src_dirpath=src_dirpath,
         dtype=dtype,
         **output_location_args,
