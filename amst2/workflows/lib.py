@@ -109,7 +109,7 @@ def run_stack_to_ome_zarr(
         f"--unit {this_param_dict['unit']} "
         f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
         f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
-        f"{'--crop_xy {}'.format(' '.join([str(x) for x in this_param_dict['crop_xy']]))} "
+        f"{'--crop_xy {}'.format(' '.join([str(x) for x in this_param_dict['crop_xy']]) if 'crop_xy' in this_param_dict else None)} "
         f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
         f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
         f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
