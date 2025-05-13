@@ -21,8 +21,11 @@ stack_to_ome_zarr:
   max_cores_per_task: 32
 
 sbs_alignment:
-  auto_mask: true
+  auto_mask: non-zero  # non-zero or variance
   gaussian_sigma: 2.0
+  elx_number_of_resolutions: 4  # Increase for bigger initial jumps
+  elx_number_of_spatial_samples: 2048  # Increase for large images
+  elx_maximum_number_of_iterations: 256  # Increase for finer alignment
   preview_downsample_level: 2
   cores: 2048
   batch_size: 32
@@ -35,7 +38,7 @@ sbs_alignment:
 
 nsbs_alignment:
   z_step: 16  # Set to approximately 80 / z-spacing. (e.g., 80 / 5nm = 16)
-  auto_mask: true
+  auto_mask: non-zero
   gaussian_sigma: 2.0
   preview_downsample_level: 2
   cores: 2048
