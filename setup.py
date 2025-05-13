@@ -30,6 +30,7 @@ setup(
     install_requires=[
         'numpy',
         'h5py',
-        'tifffile'
+        'tifffile',
+        'squirrel>=0.1.1'
     ]
 )

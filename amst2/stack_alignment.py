@@ -251,6 +251,8 @@ def snk_elastix_stack_alignment():
                              '"rule_name:30"')
     parser.add_argument('--preview_downsample_level', type=int, default=2,
                         help='Downsample level of preview volumes; default=2')
+    parser.add_argument('--debug', action='store_true',
+                        help='Set this for saving intermediate files, helpful for debugging')
 
     common_arg_fields = add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
@@ -276,6 +278,7 @@ def snk_elastix_stack_alignment():
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
+    debug = args.debug
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -342,7 +345,8 @@ def snk_elastix_stack_alignment():
             parameter_map=parameter_map,
             key='s0',
             pre_fix_big_jumps=not no_fixing_of_big_jumps,
-            pre_fix_iou_thresh=pre_fix_iou_thresh
+            pre_fix_iou_thresh=pre_fix_iou_thresh,
+            debug=debug
         ),
         **output_location_args,
         **common_args,
