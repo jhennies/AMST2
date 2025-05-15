@@ -216,8 +216,9 @@ def snk_elastix_stack_alignment():
                         help='Input ome zarr filepath')
     parser.add_argument('--transform', type=str, default='translation',
                         help='The transformation that is applied to the images; default="translation"')
-    parser.add_argument('--auto_mask', action='store_true',
-                        help='Generates a mask using image > 0')
+    parser.add_argument('--auto_mask', type=str, default='None',
+                        help='Automatically generates a mask for fixed and moving image; '
+                             'default=None; ["non-zero", "variance"]')
     parser.add_argument('--gaussian_sigma', type=float, default=0.,
                         help='Perform a gaussian smoothing before registration')
     parser.add_argument('--use_edges', action='store_true',
@@ -240,7 +241,13 @@ def snk_elastix_stack_alignment():
     parser.add_argument('--pre_fix_iou_thresh', type=float, default=0.9,
                         help='IoU-threshold below which the big jumps are pre-aligned using cross-correlation')
     parser.add_argument('--parameter_map', type=str, default=None,
-                        help='Elastix parameter map file')
+                        help='Elastix parameter map file; Overwrites any settings of the elx-parameters below')
+    parser.add_argument('--elx_number_of_resolutions', type=int, default=None,
+                        help='Elastix parameter: Number of resolution levels; Default=4')
+    parser.add_argument('--elx_number_of_spatial_samples', type=int, default=None,
+                        help='Elastix parameter: Number of spacial samples; Default=2048')
+    parser.add_argument('--elx_maximum_number_of_iterations', type=int, default=None,
+                        help='Elastix parameter: Maximum number of iterations per resolution level; Default=256')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -251,6 +258,8 @@ def snk_elastix_stack_alignment():
                              '"rule_name:30"')
     parser.add_argument('--preview_downsample_level', type=int, default=2,
                         help='Downsample level of preview volumes; default=2')
+    parser.add_argument('--debug', action='store_true',
+                        help='Set this for saving intermediate files, helpful for debugging')
 
     common_arg_fields = add_common_arguments_to_parser(parser)
     add_output_locations_to_parser(parser)
@@ -273,9 +282,13 @@ def snk_elastix_stack_alignment():
     no_fixing_of_big_jumps = args.no_fixing_of_big_jumps
     pre_fix_iou_thresh = args.pre_fix_iou_thresh
     parameter_map = os.path.abspath(args.parameter_map) if args.parameter_map is not None else None
+    elx_number_of_resolutions = args.elx_number_of_resolutions
+    elx_number_of_spatial_samples = args.elx_number_of_spatial_samples
+    elx_maximum_number_of_iterations = args.elx_maximum_number_of_iterations
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
+    debug = args.debug
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -342,7 +355,11 @@ def snk_elastix_stack_alignment():
             parameter_map=parameter_map,
             key='s0',
             pre_fix_big_jumps=not no_fixing_of_big_jumps,
-            pre_fix_iou_thresh=pre_fix_iou_thresh
+            pre_fix_iou_thresh=pre_fix_iou_thresh,
+            number_of_resolutions=elx_number_of_resolutions,
+            number_of_spatial_samples=elx_number_of_spatial_samples,
+            maximum_number_of_iterations=elx_maximum_number_of_iterations,
+            debug=debug
         ),
         **output_location_args,
         **common_args,

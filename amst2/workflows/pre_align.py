@@ -5,6 +5,8 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
 
     from .lib import load_parameter_yaml
     parameter_dict = load_parameter_yaml(parameter_yaml)
+    if verbose:
+        print(f'parameter_dict = {parameter_dict}')
 
     output_dirpath = parameter_dict['general']['output_dirpath']
 
