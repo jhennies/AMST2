@@ -245,7 +245,7 @@ def snk_ome_zarr_to_stack():
         set_resources(
             sn_args,
             [
-                'ome_zarr_batch_to_stack=dict'
+                'ome_zarr_batch_to_stack'
             ],
             [8000],
             [10],
