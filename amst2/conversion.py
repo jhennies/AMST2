@@ -157,6 +157,14 @@ def snk_ome_zarr_to_stack():
                         help='Name of the tif stack (will be a subfolder of the target dirpath)')
     parser.add_argument('--ome_zarr_key', type=str, default='s0',
                         help='Path within input ome-zarr dataset; default="s0"')
+    parser.add_argument('--mem', type=str, nargs='+', default=None,
+                        help='Cluster job memory amounts for the snakemake rules.\n'
+                             'For each rule define like so:\n'
+                             '"rule_name:16000"')
+    parser.add_argument('--runtime', type=str, nargs='+', default=None,
+                        help='Cluster job runtimes for the snakemake rules. \n'
+                             'For each rule define like so:\n'
+                             '"rule_name:30"')
 
     common_arg_fields = add_common_arguments_to_parser(parser)
     add_snakemake_arguments_to_parser(parser)
@@ -167,6 +175,8 @@ def snk_ome_zarr_to_stack():
     target_dirpath = os.path.abspath(args.target_dirpath)
     stack_name = args.stack_name
     ome_zarr_key = args.ome_zarr_key
+    mem = args.mem
+    runtime = args.runtime
 
     common_args = args_to_dict(args, common_arg_fields)
 
@@ -220,14 +230,27 @@ def snk_ome_zarr_to_stack():
     sn_args.set_threads = dict(ome_zarr_batch_to_stack=1)
 
     if args.cluster is not None:
+        # from amst2.cluster.slurm import get_cluster_settings
+        #
+        # sn_args.set_resources = dict(
+        #     ome_zarr_batch_to_stack=dict(
+        #         # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
+        #         mem_mb=8000,  # int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
+        #         runtime=30
+        #     )
+        # )
         from amst2.cluster.slurm import get_cluster_settings
+        from amst2.cluster.general import set_resources
 
-        sn_args.set_resources = dict(
-            ome_zarr_batch_to_stack=dict(
-                # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-                mem_mb=8000,  # int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
-                runtime=10
-            )
+        set_resources(
+            sn_args,
+            [
+                'ome_zarr_batch_to_stack=dict'
+            ],
+            [8000],
+            [10],
+            mem_args=mem,
+            runtime_args=runtime
         )
 
         sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
