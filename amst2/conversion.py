@@ -230,15 +230,6 @@ def snk_ome_zarr_to_stack():
     sn_args.set_threads = dict(ome_zarr_batch_to_stack=1)
 
     if args.cluster is not None:
-        # from amst2.cluster.slurm import get_cluster_settings
-        #
-        # sn_args.set_resources = dict(
-        #     ome_zarr_batch_to_stack=dict(
-        #         # I'm purposely not using snakemake's functionality here to determine mem_mb on-the-fly
-        #         mem_mb=8000,  # int(np.ceil(estimate_mem_mb(data_h) * batch_size * 8)),
-        #         runtime=30
-        #     )
-        # )
         from amst2.cluster.slurm import get_cluster_settings
         from amst2.cluster.general import set_resources
 

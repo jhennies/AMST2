@@ -1,5 +1,5 @@
 import runpy
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version = runpy.run_path("amst2/__version__.py")["__version__"]
 
@@ -10,7 +10,7 @@ setup(
     author_email='hennies@embl.de',
     url='https://github.com/jhennies/amst2',
     license="GPLv3",
-    packages=['amst2'],
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'snk_stack_to_ome_zarr = amst2.conversion:snk_stack_to_ome_zarr',
