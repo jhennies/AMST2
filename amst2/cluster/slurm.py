@@ -1,15 +1,15 @@
 
 def get_cluster_settings(sn_args, config_filepath):
 
-    import json
-    with open(config_filepath, mode='r') as f:
-        config = json.load(f)
+    # import json
+    # with open(config_filepath, mode='r') as f:
+    #     config = json.load(f)
 
     import grp
     import os
     group_name = grp.getgrgid(os.getgid()).gr_name
 
-    sn_args.executor = config['executor']
+    sn_args.executor = 'slurm'  # config['executor']
 
     from snakemake.resources import DefaultResources
     default_resources = DefaultResources()
