@@ -10,6 +10,9 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
 
     output_dirpath = parameter_dict['general']['output_dirpath']
 
+    if not os.path.exists(output_dirpath):
+        os.makedirs(output_dirpath, exist_ok=True)
+
     from .lib import run_stack_to_ome_zarr
     run_stack_to_ome_zarr(parameter_dict, parameter_key='stack_to_ome_zarr', verbose=verbose)
 

@@ -235,11 +235,28 @@ def snk_elastix_stack_alignment():
                         help='Apply the final transformation and create result ome-zarr')
     parser.add_argument('--no_preview', action='store_true',
                         help='No preview outputs are generated for the alignement steps')
-    parser.add_argument('--no_fixing_of_big_jumps', action='store_true',
-                        help='Switches off usage of cross-correlation to fix big initial jumps\n'
-                             'Only use this if you are sure that there are no big jumps in the input stack!')
-    parser.add_argument('--pre_fix_iou_thresh', type=float, default=0.9,
-                        help='IoU-threshold below which the big jumps are pre-aligned using cross-correlation')
+    parser.add_argument('--initialize_offsets_method', type=str, default=None,
+                        help='Method to solve big jumps: ["xcorr", "init_elx"]\n'
+                             '  "xcorr": Big jumps are detected by the intersection over union of the data in adjacent '
+                             'slices. \n'
+                             '      Correction is performed by cross-correlation\n'
+                             '  "init_elx": Using a highly binned version of the data, initial shifts are performed '
+                             '(grid). \n'
+                             '      The shifted moving image is used as input for elastix registration and the '
+                             'resulting alignment measured by Mutual Information (MI). \n'
+                             '      When MI < mi_thresh is reached or all positions of the grid are tested, the best '
+                             'offset is used to initialize the alignment')
+    parser.add_argument('--initialize_offsets_kwargs', type=str, nargs='+', default=(),
+                        help='Arguments for the respective initialization method. Syntax: "key:value"\n'
+                             '  defaults for the respective method:\n'
+                             '      "xcorr":\n'
+                             '          iou_thresh:0.5\n'
+                             '      "init_elx:\n'
+                             '          binning:32\n'
+                             '          spacing:256\n'
+                             '          elx_binning:4\n'
+                             '          elx_max_iters:32\n'
+                             '          mi_thresh:-0.8')
     parser.add_argument('--parameter_map', type=str, default=None,
                         help='Elastix parameter map file; Overwrites any settings of the elx-parameters below')
     parser.add_argument('--elx_number_of_resolutions', type=int, default=None,
@@ -279,8 +296,8 @@ def snk_elastix_stack_alignment():
     determine_bounds = args.determine_bounds
     apply_final = args.apply_final
     no_preview = args.no_preview
-    no_fixing_of_big_jumps = args.no_fixing_of_big_jumps
-    pre_fix_iou_thresh = args.pre_fix_iou_thresh
+    initialize_offsets_method = args.initialize_offsets_method
+    initialize_offsets_kwargs = args.initialize_offsets_kwargs
     parameter_map = os.path.abspath(args.parameter_map) if args.parameter_map is not None else None
     elx_number_of_resolutions = args.elx_number_of_resolutions
     elx_number_of_spatial_samples = args.elx_number_of_spatial_samples
@@ -289,6 +306,18 @@ def snk_elastix_stack_alignment():
     mem = args.mem
     runtime = args.runtime
     debug = args.debug
+
+    def convert_value(v):
+        try:
+            return int(v)
+        except ValueError:
+            try:
+                return float(v)
+            except ValueError:
+                return v
+    initialize_offsets_kwargs = {
+        k: convert_value(v) for k, v in (item.split(':', 1) for item in initialize_offsets_kwargs)
+    }
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -354,8 +383,8 @@ def snk_elastix_stack_alignment():
             transform=transform,
             parameter_map=parameter_map,
             key='s0',
-            pre_fix_big_jumps=not no_fixing_of_big_jumps,
-            pre_fix_iou_thresh=pre_fix_iou_thresh,
+            initialize_offsets_method=initialize_offsets_method,
+            initialize_offsets_kwargs=initialize_offsets_kwargs,
             number_of_resolutions=elx_number_of_resolutions,
             number_of_spatial_samples=elx_number_of_spatial_samples,
             maximum_number_of_iterations=elx_maximum_number_of_iterations,
