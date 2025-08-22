@@ -24,6 +24,7 @@ if __name__ == '__main__':
         **snakemake.params.elastix_stack_alignment_workflow_params,
         z_range=z_range,
         determine_bounds=snakemake.params['determine_bounds'],
+        n_workers=n_threads,
         verbose=verbose
     )
 

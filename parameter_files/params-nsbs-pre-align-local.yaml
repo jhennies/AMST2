@@ -28,7 +28,7 @@ sbs_alignment:
   elx_number_of_resolutions: 2  # Increase for bigger initial jumps, if not using init_elx above
   elx_number_of_spatial_samples: 2048  # Increase for large images
   elx_maximum_number_of_iterations: 256  # Increase for finer alignment
-  preview_downsample_level: 2
+  preview_downsample_level: 3
 
 nsbs_alignment:
   z_step: 8  # Adjust the z-step if needed
