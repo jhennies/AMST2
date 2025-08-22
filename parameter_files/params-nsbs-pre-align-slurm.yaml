@@ -24,14 +24,19 @@ sbs_alignment:
   auto_mask: non-zero  # non-zero or variance
   gaussian_sigma: 2.0
   initialize_offsets_method: init_elx
-  initialize_offsets_kwargs: ["binning:32", "spacing:256", "elx_binning:4", "elx_max_iters:32", "mi_thresh:-0.8"]
+  initialize_offsets_kwargs:
+    binning: 32
+    spacing: 256
+    elx_binning: 4
+    elx_max_iters: 32
+    mi_thresh: -0.8
   elx_number_of_resolutions: 2  # Increase for bigger initial jumps, if not using init_elx above
   elx_number_of_spatial_samples: 2048  # Increase for large images
   elx_maximum_number_of_iterations: 256  # Increase for finer alignment
   preview_downsample_level: 3
   cores: 2048
-  batch_size: 32
-  max_cores_per_task: 32
+  batch_size: 16
+  max_cores_per_task: 8
   runtime:
     elastix_stack_alignment: 60
   mem:
@@ -44,8 +49,8 @@ nsbs_alignment:
   gaussian_sigma: 2.0
   preview_downsample_level: 2
   cores: 2048
-  batch_size: 32
-  max_cores_per_task: 32
+  batch_size: 16
+  max_cores_per_task: 8
   runtime:
     elastix_stack_alignment: 60
   mem:
@@ -54,8 +59,8 @@ nsbs_alignment:
 
 apply_pre_align:
   cores: 2048
-  batch_size: 32
-  max_cores_per_task: 32
+  batch_size: 16
+  max_cores_per_task: 8
   mem:
     apply_final_transform: 16000
 
