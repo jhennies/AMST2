@@ -35,6 +35,6 @@ setup(
         'numpy',
         'h5py',
         'tifffile',
-        'squirrel>=0.1.2'
+        'squirrel>=0.2.3'
     ]
 )
