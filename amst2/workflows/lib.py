@@ -153,6 +153,7 @@ def run_nsbs_alignment(
 
     mem_str = get_resource_str(this_param_dict, 'mem')
     runtime_str = get_resource_str(this_param_dict, 'runtime')
+    init_offsets_kwargs_str = get_resource_str(this_param_dict, 'initialize_offsets_kwargs')
 
     if input_dirpath is None:
         input_dirpath = f"{this_param_dict['input_dirpath']} "
@@ -167,6 +168,8 @@ def run_nsbs_alignment(
         f"{'--elx_number_of_resolutions {}'.format(this_param_dict['elx_number_of_resolutions']) if 'elx_number_of_resolutions' in this_param_dict else ''} "
         f"{'--elx_number_of_spatial_samples {}'.format(this_param_dict['elx_number_of_spatial_samples']) if 'elx_number_of_spatial_samples' in this_param_dict else ''} "
         f"{'--elx_maximum_number_of_iterations {}'.format(this_param_dict['elx_maximum_number_of_iterations']) if 'elx_maximum_number_of_iterations' in this_param_dict else ''} "
+        f"{'--initialize_offsets_method {}'.format(this_param_dict['initialize_offsets_method']) if 'initialize_offsets_method' in this_param_dict else ''} "
+        f"{'--initialize_offsets_kwargs {}'.format(init_offsets_kwargs_str) if 'initialize_offsets_kwargs' in this_param_dict else ''} "
         f"{'--apply_final' if 'apply_final' in this_param_dict and this_param_dict['apply_final'] else ''} "
         f"{'--auto_mask {}'.format(this_param_dict['auto_mask']) if 'auto_mask' in this_param_dict else ''} "
         f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "

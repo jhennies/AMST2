@@ -24,7 +24,7 @@ sbs_alignment:
   auto_mask: non-zero  # non-zero or variance
   gaussian_sigma: 2.0
   initialize_offsets_method: init_elx
-  initialize_offset_kwargs: ["binning:32", "spacing:256", "elx_binning:4", "elx_max_iters:32", "mi_thresh:-0.8"]
+  initialize_offsets_kwargs: ["binning:32", "spacing:256", "elx_binning:4", "elx_max_iters:32", "mi_thresh:-0.8"]
   elx_number_of_resolutions: 2  # Increase for bigger initial jumps, if not using init_elx above
   elx_number_of_spatial_samples: 2048  # Increase for large images
   elx_maximum_number_of_iterations: 256  # Increase for finer alignment
