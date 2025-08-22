@@ -11,6 +11,10 @@ setup(
     url='https://github.com/jhennies/amst2',
     license="GPLv3",
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        "amst2": ["snakemake_workflows/*.snk"],
+    },
     entry_points={
         'console_scripts': [
             'snk_stack_to_ome_zarr = amst2.conversion:snk_stack_to_ome_zarr',
@@ -31,6 +35,6 @@ setup(
         'numpy',
         'h5py',
         'tifffile',
-        'squirrel>=0.1.2'
+        'squirrel>=0.2.4'
     ]
 )
