@@ -24,8 +24,8 @@ def snk_stack_to_ome_zarr():
                         help='Input h5 container or tif stack')
     parser.add_argument('--stack_pattern', type=str, default='*.tif',
                         help='File pattern for globbing the input stack; default="*.tif"')
-    parser.add_argument('--stack_key', type=str, default='data',
-                        help='Path within input h5 file; default="data"')
+    parser.add_argument('--stack_key', type=str, default=None,
+                        help='Path within input h5 file; default=None')
     parser.add_argument('--save_bounds', action='store_true',
                         help='Saves a json file alongside that contains the bounds of the non-zero area of each slice')
     parser.add_argument('--crop_xy', type=int, nargs=4, default=None,
