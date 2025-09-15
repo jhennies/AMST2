@@ -1,0 +1,49 @@
+# This is an example parameter file for the nth-slice-by-slice pre-alignment workflow
+# Copy this parameter file to your desired location and adjust to your needs
+# Then run the workflow using:
+#    amst2-wf-nsbs_pre_align-run /path/to/my/params-nsbs-pre-align-local.yaml
+# This parameter file has been tested on the first 32 slices of the https://www.ebi.ac.uk/empiar/EMPIAR-10311/ dataset
+
+general:
+  input_dirpath: /path/to/your/data(.ome.zarr)  # tif stack or ome-zarr dataset
+  output_dirpath: /path/to/target/directory
+  resolution: [ 0.01, 0.01, 0.01 ]  # Adjust the resolution and unit below to your dataset!
+  unit: micrometer
+  stack_key: s0  # Used to find the data in ome.zarr, n5 or hdf5 datasets
+  stack_pattern: '*.tif'  # The file pattern of a tiff stack
+  auto_pad: true  # This will make sure the canvas size is nicely adjusted to the data
+  cores: 16
+  batch_size: 8
+  max_cores_per_task: 8
+
+stack_to_ome_zarr:
+  # When active = true, the input dataset will be converted to ome.zarr
+  # This enables an alignment preview for the alignment steps below but otherwise is not necessary
+  active: false
+
+sbs_alignment:
+  auto_mask: non-zero  # non-zero or variance
+  gaussian_sigma: 2.0
+  initialize_offsets_method: init_elx
+  initialize_offsets_kwargs:
+    binning: 32
+    spacing: 256
+    elx_binning: 4
+    elx_max_iters: 32
+    mi_thresh: -0.8
+  elx_number_of_resolutions: 2  # Increase for bigger initial jumps, if not using init_elx above
+  elx_number_of_spatial_samples: 2048  # Increase for large images
+  elx_maximum_number_of_iterations: 256  # Increase for finer alignment
+  preview_downsample_level: 3
+
+nsbs_alignment:
+  z_step: 8  # Adjust the z-step if needed
+  auto_mask: non-zero
+  gaussian_sigma: 2.0
+  preview_downsample_level: 2
+
+apply_pre_align: {}
+
+pre_align_to_tif_stack:
+  # Set to true if you prefer a tiff stack output
+  active: false

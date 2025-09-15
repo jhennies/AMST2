@@ -33,14 +33,12 @@ if __name__ == '__main__':
     # Downsample the transformations
     from squirrel.library.ome_zarr import get_ome_zarr_handle, get_scale_of_downsample_level
 
-    input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
-    scale_full = get_scale_of_downsample_level(input_ome_zarr_fileh, 0)
-    scale_ds = get_scale_of_downsample_level(input_ome_zarr_fileh, preview_downsample_level)
-    scale = (np.array(scale_ds) / np.array(scale_full)).astype(int)
-    assert scale[0] == scale[1] == scale[2], 'Implemented only for isotropic scaling!'
-    scale = 1 / scale[0]
-    if verbose:
-        print(f'scale = {scale}')
+    import zarr
+    try:
+        input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
+    except zarr.errors.PathNotFoundError:
+        input_ome_zarr_fileh = None
+
     # if not transforms.is_sequenced:
     #     transforms = transforms.get_sequenced_stack()
     assert transforms.is_sequenced
@@ -65,8 +63,6 @@ if __name__ == '__main__':
     if not transforms.exists_meta('stack_shape'):
         transforms.set_meta('stack_shape', stack_shape)
 
-    stack_shape = (np.array(stack_shape) * scale).astype(int)
-
     print(f'len(transforms) = {len(transforms)}')
     if transforms.exists_meta('z_step'):
         transforms = transforms.apply_z_step()
@@ -76,24 +72,37 @@ if __name__ == '__main__':
     if save_joined_transforms:
         transforms.to_file(transforms_filepath)
 
-    # Scale the transformations
-    transforms = transforms.get_scaled(scale)
+    if input_ome_zarr_fileh is not None:
 
-    print(f'stack_shape = {stack_shape}')
-    print(f'scale = {scale}')
+        scale_full = get_scale_of_downsample_level(input_ome_zarr_fileh, 0)
+        scale_ds = get_scale_of_downsample_level(input_ome_zarr_fileh, preview_downsample_level)
+        scale = (np.array(scale_ds) / np.array(scale_full)).astype(int)
+        assert scale[0] == scale[1] == scale[2], 'Implemented only for isotropic scaling!'
+        scale = 1 / scale[0]
+        if verbose:
+            print(f'scale = {scale}')
 
-    # Apply the transformations
-    from squirrel.library.transformation import apply_stack_alignment
-    input_ome_zarr_dataseth = input_ome_zarr_fileh[f's{preview_downsample_level}']
+        # Scale the transformations
+        stack_shape = (np.array(stack_shape) * scale).astype(int)
+        transforms = transforms.get_scaled(scale)
+        print(f'stack_shape = {stack_shape}')
+        print(f'scale = {scale}')
 
-    result_stack = apply_stack_alignment(
-        input_ome_zarr_dataseth,
-        stack_shape,
-        transforms,
-        no_adding_of_transforms=True,
-        verbose=verbose
-    )
+        # Apply the transformations
+        from squirrel.library.transformation import apply_stack_alignment
+        input_ome_zarr_dataseth = input_ome_zarr_fileh[f's{preview_downsample_level}']
 
-    # Write the result stack to disk
-    from squirrel.library.io import write_h5_container
-    write_h5_container(output, result_stack)
+        result_stack = apply_stack_alignment(
+            input_ome_zarr_dataseth,
+            stack_shape,
+            transforms,
+            no_adding_of_transforms=True,
+            verbose=verbose
+        )
+
+        # Write the result stack to disk
+        from squirrel.library.io import write_h5_container
+        write_h5_container(output, result_stack)
+
+    else:
+        open(output, mode='w').close()

@@ -31,7 +31,7 @@ mkdir pre-align-out-dir
 cd pre-align-out-dir
 ```
 
-Copy and modify the [pre-alignment parameter file](../parameter_files/params-nsbs-pre-align-local.yaml)
+Copy and modify the [pre-alignment parameter file](../amst2/parameter_files/params-nsbs-pre-align-local.yaml)
 
 ```
 cp /path/to/this/repo/parameter_files/params-nsbs-pre-align-local.yaml ./my-pre-align-params.yaml
@@ -61,7 +61,7 @@ mkdir amst-out-dir
 cd amst-out-dir
 ```
 
-Copy and modify the [AMST parameter file](../parameter_files/params-amst-bspline-local.yaml)
+Copy and modify the [AMST parameter file](../amst2/parameter_files/params-amst-bspline-local.yaml)
 
 ```
 cp /path/to/this/repo/parameter_files/params-amst-bspline-local.yaml ./my-amst-params.yaml
