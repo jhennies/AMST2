@@ -397,9 +397,102 @@ PARAMETER_FILE_NAMES = dict(
 )
 
 
+import ast
+
+
+def _parse_value(value: str):
+    """Convert string to bool, int, float, list, or keep as string."""
+    # Boolean check
+    if value.lower() == "true":
+        return True
+    elif value.lower() == "false":
+        return False
+
+    # Try number (int or float)
+    try:
+        if "." in value:
+            return float(value)
+        else:
+            return int(value)
+    except ValueError:
+        pass
+
+    # Try list
+    if value.startswith("[") and value.endswith("]"):
+        try:
+            parsed = ast.literal_eval(value)
+            if isinstance(parsed, list):
+                return [_parse_value(str(v)) for v in parsed]
+        except Exception:
+            return value  # fallback
+
+    # Default: string
+    return value
+
+
+def _build_nested_dict(pairs):
+    """Convert list of 'a:b:c:value' strings to nested dict."""
+    result = {}
+    for pair in pairs:
+        keys = pair.split(":")
+        *path, raw_value = keys
+        value = _parse_value(raw_value)
+
+        d = result
+        for k in path[:-1]:
+            d = d.setdefault(k, {})
+        d[path[-1]] = value
+    return result
+
+
+def deep_merge(base: dict, new: dict) -> dict:
+    """
+    Recursively merge `new` into `base`.
+    - dicts are merged
+    - other values are overwritten
+    """
+    for key, value in new.items():
+        if (
+            key in base
+            and isinstance(base[key], dict)
+            and isinstance(value, dict)
+        ):
+            deep_merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+def merge_into_yaml_file(yaml_file: str, new_dict: dict):
+    """
+    Merge `new_dict` into an existing YAML file, preserving comments and order.
+    """
+    from ruamel.yaml import YAML
+
+    yaml = YAML()
+    yaml.preserve_quotes = True  # Keep quotes as in original
+    yaml.indent(mapping=2, sequence=4, offset=2)
+
+    # Load existing YAML
+    with open(yaml_file) as f:
+        base = yaml.load(f)
+
+    # Merge dictionaries
+    deep_merge(base, new_dict)
+
+    # Write back to file, preserving comments/order
+    with open(yaml_file, "w") as f:
+        yaml.dump(base, f)
+
+
 def get_default_parameter_file_from_repo(
         workflow,  # pre_align or amst
         output_filepath=None,
+        params=None,
+        param_input_dirpath=None,
+        param_output_dirpath=None,
+        param_pre_align_dirpath=None,
+        param_pre_align_transforms=None,
         slurm=False,
         verbose=False,
 ):
@@ -430,3 +523,33 @@ def get_default_parameter_file_from_repo(
     if verbose:
         print(f"Created parameter file at: {output_filepath}")
         print(f"(Template source: {data_path})")
+
+    # We are done if no manually set parameters are given
+    if all(v is None for v in (
+            params,
+            param_output_dirpath,
+            param_input_dirpath,
+            param_pre_align_dirpath,
+            param_pre_align_transforms
+    )):
+        return
+
+    params = [] if params is None else params
+    if param_input_dirpath is not None:
+        params.append(f'general:input_dirpath:{param_input_dirpath}')
+    if param_output_dirpath is not None:
+        params.append(f'general:output_dirpath:{param_output_dirpath}')
+    if param_pre_align_dirpath is not None:
+        params.append(f'general:pre_align_dirpath:{param_pre_align_dirpath}')
+    if param_pre_align_transforms is not None:
+        params.append(f'general:pre_align_transforms:{param_pre_align_transforms}')
+
+    # Decode the parameter inputs
+    params = _build_nested_dict(params)
+    if verbose:
+        print(f'params = {params}')
+
+    # Update the yaml
+    merge_into_yaml_file(output_filepath, params)
+
+

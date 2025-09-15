@@ -33,17 +33,19 @@ mkdir pre-align-out-dir
 cd pre-align-out-dir
 ```
 
-Generate a pre-alignment parameter file and modify it as required (compute resources, resolution of the dataset, etc.)
+Generate a pre-alignment parameter file
 
 ```
-amst2-wf-nsbs_pre_align-get_default_parameter_file
+amst2-wf-nsbs_pre_align-get_default_parameter_file --param_input_dirpath /path/to/dataset --param_output_dirpath .
 ```
 
-This will create the parameter file called "params_pre_align.yaml"; modify input and output locations, resolution and compute resources:
+Replace ```/path/to/dataset``` with the location of the input data.
+
+This will create the parameter file called "params_pre_align.yaml" which contains the proper input and output directories
+
+You now need to open the parameter file and modify parameters such as resolution and compute resources:
 
 ```
-  input_dirpath: /path/to/dataset  # Adjust this to match your location!
-  output_dirpath: .  # We already created the target directory and will run the workflow from there
   resolution: [ 0.008, 0.005, 0.005 ] 
   cores: 16  # Adjust as necessary!
 ```
@@ -81,25 +83,24 @@ cd amst-out-dir
 As for the pre-alignment, generate a parameter file and modify it as required (compute resources, resolution of the dataset, etc.)
 
 ```
-amst2-wf-amst-get_default_parameter_file
+amst2-wf-amst-get_default_parameter_file --pre_align_yaml params_pre_align.yaml --param_output_dirpath .
 ```
 
-This will create the parameter file called "params_amst.yaml"; modify input and output locations and compute resources:
+This will create the parameter file called "params_amst.yaml" where all input directory paths are properly set, as this 
+information can be derived from the pre alignment yaml file. 
+
+Again, modify compute resources:
 
 ```
-  input_dirpath: /path/to/dataset  # This is the same input dataset as for the pre-alignment
-  pre_align_dirpath: ../pre-align-out-dir/apply_pre_align/nsbs-pre-align.ome.zarr
-  pre_align_transforms: ../pre-align-out-dir/nsbs-pre-align.json
-  output_dirpath: . 
   cores: 16  # Adjust as necessary!
 ```
 
-Again, make sure ```cores >= batch_size >= max_cores_per_task```
+Amd make sure ```cores >= batch_size >= max_cores_per_task```
 
 Run AMST:
 
 ```
-amst-run params_amst.yaml
+amst2-wf-amst-run params_amst.yaml
 ```
 
 Now you can check the result:

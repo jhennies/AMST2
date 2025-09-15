@@ -203,8 +203,21 @@ def get_default_parameter_file():
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('-o', '--output_filepath', type=str, default=None,
+    parser.add_argument('-fp', '--output_filepath', type=str, default=None,
                         help='Filepath of the parameter file. By default it is created in the current directory')
+    parser.add_argument('-pi', '--param_input_dirpath', type=str, default=None,
+                        help='The parameter "general:input_dirpath" will be pre-set to this value')
+    parser.add_argument('-po', '--param_output_dirpath', type=str, default=None,
+                        help='The parameter "general:output_dirpath" will be pre-set to this value')
+    parser.add_argument('-p', '--params', nargs='+', default=None,
+                        help='Specify any parameter and its value in this format:\n'
+                             '  --params group:parameter_name:value\n'
+                             '  Examples:\n'
+                             '    --params stack_to_ome_zarr:active:true general:cores:32  -> enables input ome zarr conversion and sets the number of compute cores to 32\n'
+                             '    --params general:resolution:[0.02,0.02,0.02]  -> Sets resolution to 0.02 isotropic\n'
+                             '  Note: One Item consisting of group:parameter_name:value must not contain any spaces!\n'
+                             '  Also note: You can generate any entry like this - also ones that have no effect!\n'
+                             '  The idea of having this input argument is to make a workflow fully scriptable without the requirement for manually adjusting the parameter file.')
     parser.add_argument('--slurm', action='store_true',
                         help='Creates the parameter file for a slurm cluster; Note that the compute settings may '
                              'require adjustment')
@@ -213,8 +226,19 @@ def get_default_parameter_file():
     args = parser.parse_args()
 
     output_filepath = args.output_filepath
+    param_input_dirpath = args.param_input_dirpath
+    param_output_dirpath = args.param_output_dirpath
+    params = args.params
     slurm = args.slurm
     verbose = args.verbose
 
     from amst2.workflows.lib import get_default_parameter_file_from_repo
-    get_default_parameter_file_from_repo('pre_align', output_filepath=output_filepath, slurm=slurm, verbose=verbose)
+    get_default_parameter_file_from_repo(
+        'pre_align',
+        output_filepath=output_filepath,
+        param_input_dirpath=param_input_dirpath,
+        param_output_dirpath=param_output_dirpath,
+        params=params,
+        slurm=slurm,
+        verbose=verbose
+    )
