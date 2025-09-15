@@ -27,4 +27,4 @@ apply_amst:
     apply_final_transform: 16000
 
 amst_to_tif_stack:
-  active: true
+  active: false

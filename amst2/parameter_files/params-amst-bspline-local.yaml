@@ -24,4 +24,4 @@ amst:
 apply_amst: {}
 
 amst_to_tif_stack:
-  active: true
+  active: false
