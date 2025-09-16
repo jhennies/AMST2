@@ -1,7 +1,7 @@
 # This is an example parameter file for the AMST workflow
 # Copy this parameter file to your desired location and adjust to your needs
 # Then run the workflow using:
-#    amst-run /path/to/my/params-amst-bspline.yaml
+#    amst2-wf-amst-run /path/to/my/params-amst-bspline-slurm.yaml
 
 general:
   # These three can be omitted if AMST is run inside the same target folder as the pre-align >>>
@@ -10,9 +10,10 @@ general:
   pre_align_transforms: /path/to/pre-alignment-transforms.json  # Defaults to <output_dirpath>/nsbs-pre-align.json
   # <<<run
   output_dirpath: /path/to/target/directory
-  cores: 16
-  batch_size: 4
-  max_cores_per_task: 4
+  cluster: slurm
+  batch_size: 32
+  cores: 2048
+  max_cores_per_task: 32
 
 amst:
   elastix_parameter_file: auto
@@ -21,7 +22,9 @@ amst:
   gaussian_sigma: 2.0
   auto_mask_off: false
 
-apply_amst: {}
+apply_amst:
+  mem:
+    apply_final_transform: 16000
 
 amst_to_tif_stack:
-  active: true
+  active: false

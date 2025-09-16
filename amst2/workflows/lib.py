@@ -101,9 +101,11 @@ def run_stack_to_ome_zarr(
     runtime_str = get_resource_str(this_param_dict, 'runtime')
 
     run_script = (
-        "snk_stack_to_ome_zarr "
+        "amst2-stack_to_ome_zarr "
         f"{this_param_dict['input_dirpath']} "
         f"{output_dirpath} "
+        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
+        f"{'--stack_pattern {}'.format(this_param_dict['stack_pattern']) if 'stack_pattern' in this_param_dict else ''} "
         f"-out-oz-fn input-raw.ome.zarr "
         f"--resolution {' '.join([str(x) for x in this_param_dict['resolution']])} "
         f"--unit {this_param_dict['unit']} "
@@ -159,9 +161,13 @@ def run_nsbs_alignment(
         input_dirpath = f"{this_param_dict['input_dirpath']} "
 
     run_script = (
-        "snk_elastix_stack_alignment "
+        "amst2-elastix_stack_alignment "
         f"{input_dirpath} "
         f"{output_dirpath} "
+        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
+        f"{'--stack_pattern {}'.format(this_param_dict['stack_pattern']) if 'stack_pattern' in this_param_dict else ''} "
+        f"{'--resolution {}'.format(' '.join([str(x) for x in this_param_dict['resolution']])) if 'resolution' in this_param_dict else ''} "
+        f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
         f"-out-oz-fn {'nsbs' if 'z_step' in this_param_dict and this_param_dict['z_step'] > 1 else 'sbs'}.ome.zarr "
         f"--z_step {this_param_dict['z_step'] if 'z_step' in this_param_dict else 1} "
         f"--gaussian_sigma {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
@@ -177,7 +183,7 @@ def run_nsbs_alignment(
         f"{'--auto_pad' if 'auto_pad' in this_param_dict else ''} "
         f"--preview_downsample_level {this_param_dict['preview_downsample_level'] if 'preview_downsample_level' in this_param_dict else 2} "
         f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
-        f"--cores {this_param_dict['cores'] if 'c ores' in this_param_dict else 2048} "
+        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
         f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
         f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
         f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
@@ -217,29 +223,33 @@ def run_apply_transformation(
     mem_str = get_resource_str(this_param_dict, 'mem')
     runtime_str = get_resource_str(this_param_dict, 'runtime')
 
-    # if input_dirpath is None:
-    #     input_dirpath = f"{this_param_dict['input_dirpath']} "
+    if input_dirpath is None:
+        input_dirpath = f"{this_param_dict['input_dirpath']} "
 
     if verbose:
-        print(f'checking input dirpath for applying transformation ...')
+        # print(f'checking input dirpath for applying transformation ...')
         print(this_param_dict)
-    if 'input_dirpath' in this_param_dict:
-        from squirrel.library.io import get_filetype
-        if get_filetype(this_param_dict['input_dirpath']) == 'ome_zarr':
-            input_dirpath = this_param_dict['input_dirpath']
-        else:
-            if verbose:
-                print(f"filetype of input_dirpath is {get_filetype(this_param_dict['input_dirpath'])}")
-                print(f"  ... using '{input_dirpath}' instead")
+    # if 'input_dirpath' in this_param_dict:
+    #     from squirrel.library.io import get_filetype
+    #     if get_filetype(this_param_dict['input_dirpath']) == 'ome_zarr':
+    #         input_dirpath = this_param_dict['input_dirpath']
+    #     else:
+    #         if verbose:
+    #             print(f"filetype of input_dirpath is {get_filetype(this_param_dict['input_dirpath'])}")
+    #             print(f"  ... using '{input_dirpath}' instead")
 
     if type(transforms_filepath) == list or type(transforms_filepath) == tuple:
         transforms_filepath = ' '.join(transforms_filepath)
 
     run_script = (
-        "snk_apply_transformation "
+        "amst2-apply_transformation "
         f"{input_dirpath} "
         f"{transforms_filepath} "
         f"{output_dirpath} "
+        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
+        f"{'--stack_pattern {}'.format(this_param_dict['stack_pattern']) if 'stack_pattern' in this_param_dict else ''} "
+        f"{'--resolution {}'.format(' '.join([str(x) for x in this_param_dict['resolution']])) if 'resolution' in this_param_dict else ''} "
+        f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
         f"{'-out-oz-fn {}'.format(output_filename) if output_filename is not None else ''} "
         f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
         f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
@@ -285,7 +295,7 @@ def run_ome_zarr_to_stack(
         input_dirpath = f"{this_param_dict['input_dirpath']} "
 
     run_script = (
-        "snk_ome_zarr_to_stack " 
+        "amst2-ome_zarr_to_stack " 
         f"{input_dirpath} "
         f"{output_dirpath} "
         f"{output_dirname} " 
@@ -352,7 +362,7 @@ def run_amst(
     pre_align_dirpath = this_param_dict['pre_align_dirpath'] if 'pre_align_dirpath' in this_param_dict else pre_align_dirpath
 
     run_script = (
-        "snk_amst "
+        "amst2-amst "
         f"{pre_align_dirpath} "
         f"{output_dirpath} "
         f"--transform {this_param_dict['transform']} "
@@ -377,4 +387,169 @@ def run_amst(
 
     if not error:
         open(done_fp, 'w').close()
+
+
+PARAMETER_FILE_NAMES = dict(
+    pre_align_slurm='params-nsbs-pre-align-slurm.yaml',
+    pre_align_local='params-nsbs-pre-align-local.yaml',
+    amst_slurm='params-amst-bspline-slurm.yaml',
+    amst_local='params-amst-bspline-local.yaml'
+)
+
+
+import ast
+
+
+def _parse_value(value: str):
+    """Convert string to bool, int, float, list, or keep as string."""
+    # Boolean check
+    if value.lower() == "true":
+        return True
+    elif value.lower() == "false":
+        return False
+
+    # Try number (int or float)
+    try:
+        if "." in value:
+            return float(value)
+        else:
+            return int(value)
+    except ValueError:
+        pass
+
+    # Try list
+    if value.startswith("[") and value.endswith("]"):
+        try:
+            parsed = ast.literal_eval(value)
+            if isinstance(parsed, list):
+                return [_parse_value(str(v)) for v in parsed]
+        except Exception:
+            return value  # fallback
+
+    # Default: string
+    return value
+
+
+def _build_nested_dict(pairs):
+    """Convert list of 'a:b:c:value' strings to nested dict."""
+    result = {}
+    for pair in pairs:
+        keys = pair.split(":")
+        *path, raw_value = keys
+        value = _parse_value(raw_value)
+
+        d = result
+        for k in path[:-1]:
+            d = d.setdefault(k, {})
+        d[path[-1]] = value
+    return result
+
+
+def deep_merge(base: dict, new: dict) -> dict:
+    """
+    Recursively merge `new` into `base`.
+    - dicts are merged
+    - other values are overwritten
+    """
+    for key, value in new.items():
+        if (
+            key in base
+            and isinstance(base[key], dict)
+            and isinstance(value, dict)
+        ):
+            deep_merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+def merge_into_yaml_file(yaml_file: str, new_dict: dict):
+    """
+    Merge `new_dict` into an existing YAML file, preserving comments and order.
+    """
+    from ruamel.yaml import YAML
+
+    yaml = YAML()
+    yaml.preserve_quotes = True  # Keep quotes as in original
+    yaml.indent(mapping=2, sequence=4, offset=2)
+
+    # Load existing YAML
+    with open(yaml_file) as f:
+        base = yaml.load(f)
+
+    # Merge dictionaries
+    deep_merge(base, new_dict)
+
+    # Write back to file, preserving comments/order
+    with open(yaml_file, "w") as f:
+        yaml.dump(base, f)
+
+
+def get_default_parameter_file_from_repo(
+        workflow,  # pre_align or amst
+        output_filepath=None,
+        params=None,
+        param_input_dirpath=None,
+        param_output_dirpath=None,
+        param_pre_align_dirpath=None,
+        param_pre_align_transforms=None,
+        slurm=False,
+        verbose=False,
+):
+    import importlib.resources as resources
+    import shutil
+
+    if workflow not in ['pre_align', 'amst']:
+        raise ValueError(f'Invalid workflow name: {workflow}; valid workflows: ["pre_align", "amst"]')
+
+    # Pick correct template filename
+    template_filename = PARAMETER_FILE_NAMES[f'{workflow}_{"slurm" if slurm else "local"}']
+
+    # Access the subfolder with your packaged resources
+    # Replace 'mypackage' and 'subfolder' with the real names
+    data_path = resources.files("amst2") / "parameter_files" / template_filename
+
+    if not data_path.is_file():
+        raise FileNotFoundError(f"Template file not found in package: {data_path}")
+
+    # Set default output filepath if not provided
+    if output_filepath is None:
+        output_filename = f"params_{workflow}.yaml"
+        output_filepath = os.path.join(os.getcwd(), output_filename)
+
+    # Copy file to output location
+    shutil.copy(data_path, output_filepath)
+
+    if verbose:
+        print(f"Created parameter file at: {output_filepath}")
+        print(f"(Template source: {data_path})")
+
+    # We are done if no manually set parameters are given
+    if all(v is None for v in (
+            params,
+            param_output_dirpath,
+            param_input_dirpath,
+            param_pre_align_dirpath,
+            param_pre_align_transforms
+    )):
+        return
+
+    params = [] if params is None else params
+    if param_input_dirpath is not None:
+        params.append(f'general:input_dirpath:{param_input_dirpath}')
+    if param_output_dirpath is not None:
+        params.append(f'general:output_dirpath:{param_output_dirpath}')
+    if param_pre_align_dirpath is not None:
+        params.append(f'general:pre_align_dirpath:{param_pre_align_dirpath}')
+    if param_pre_align_transforms is not None:
+        params.append(f'general:pre_align_transforms:{param_pre_align_transforms}')
+
+    # Decode the parameter inputs
+    params = _build_nested_dict(params)
+    if verbose:
+        print(f'params = {params}')
+
+    # Update the yaml
+    merge_into_yaml_file(output_filepath, params)
+
 

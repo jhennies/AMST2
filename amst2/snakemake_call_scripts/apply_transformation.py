@@ -90,7 +90,8 @@ if __name__ == '__main__':
     result_stack = apply_multi_step_stack_alignment_workflow(
         input_ome_zarr_filepath,
         transformations_filepath,
-        key='s0',
+        key=run_info['stack_key'],
+        pattern=run_info['stack_pattern'],
         auto_pad=False,
         z_range=z_range,
         start_transform_id=z_range[0],
@@ -101,7 +102,7 @@ if __name__ == '__main__':
 
     print(f'result_stack.shape = {result_stack.shape}')
     print(f'output dataset shape = {get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape}')
-    print(f'input dataset shape = {get_ome_zarr_handle(input_ome_zarr_filepath, mode="r")["s0"].shape}')
+    # print(f'input dataset shape = {get_ome_zarr_handle(input_ome_zarr_filepath, mode="r")["s0"].shape}')
     from squirrel.library.volume import pad_volume
     result_stack = pad_volume(result_stack, get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape, axes=[1, 2])
     print(f'output dataset shape (adjusted) = {get_ome_zarr_handle(output_ome_zarr_filepath, mode="r")["s0"].shape}')

@@ -214,6 +214,14 @@ def snk_elastix_stack_alignment():
 
     parser.add_argument('input_ome_zarr_filepath', type=str,
                         help='Input ome zarr filepath')
+    parser.add_argument('--stack_pattern', type=str, default='*.tif',
+                        help='File pattern for globbing the input stack; default="*.tif"')
+    parser.add_argument('--stack_key', type=str, default=None,
+                        help='Path within input h5 file; default=None')
+    parser.add_argument('--resolution', type=float, nargs=3, default=None,
+                        help='Resolution of the dataset, needs to be supplied if not using ome.zarr data')
+    parser.add_argument('--unit', type=str, default='micrometers',
+                        help='Unit of the resolution; default = "micrometers"')
     parser.add_argument('--transform', type=str, default='translation',
                         help='The transformation that is applied to the images; default="translation"')
     parser.add_argument('--auto_mask', type=str, default='None',
@@ -286,6 +294,10 @@ def snk_elastix_stack_alignment():
     args = parser.parse_args()
 
     input_ome_zarr_filepath = os.path.abspath(args.input_ome_zarr_filepath)
+    stack_pattern = args.stack_pattern
+    stack_key = args.stack_key
+    unit = args.unit
+    resolution = args.resolution
     transform = args.transform
     auto_mask = args.auto_mask
     gaussian_sigma = args.gaussian_sigma
@@ -340,11 +352,12 @@ def snk_elastix_stack_alignment():
         get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset
     )
     print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
-    data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
+    data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], common_args['batch_size'])]
-    ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
-    resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
-    unit = get_unit_of_dataset(ome_zarr_h)
+    if resolution is None:
+        ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=stack_key, mode='r')
+        resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
+        unit = get_unit_of_dataset(ome_zarr_h)
     dtype = str(data_h.dtype)
 
     assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
@@ -362,6 +375,8 @@ def snk_elastix_stack_alignment():
 
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
+        stack_pattern=stack_pattern,
+        stack_key=stack_key,
         no_preview=no_preview,
         batch_ids=batch_ids,
         stack_shape=shape_h,
@@ -375,6 +390,8 @@ def snk_elastix_stack_alignment():
         determine_bounds=determine_bounds,
         apply_final=apply_final,
         elastix_stack_alignment_workflow_params=dict(
+            key=stack_key,
+            pattern=stack_pattern,
             auto_mask=auto_mask,
             gaussian_sigma=gaussian_sigma,
             use_edges=use_edges,
@@ -382,7 +399,6 @@ def snk_elastix_stack_alignment():
             average_for_z_step=average_for_z_step,
             transform=transform,
             parameter_map=parameter_map,
-            key='s0',
             initialize_offsets_method=initialize_offsets_method,
             initialize_offsets_kwargs=initialize_offsets_kwargs,
             number_of_resolutions=elx_number_of_resolutions,
@@ -457,6 +473,14 @@ def snk_apply_transformation():
                         help='Input ome zarr filepath')
     parser.add_argument('input_transforms_filepaths', type=str, nargs='+',
                         help='Filepaths to transformations file (*.json) or directory')
+    parser.add_argument('--stack_pattern', type=str, default='*.tif',
+                        help='File pattern for globbing the input stack; default="*.tif"')
+    parser.add_argument('--stack_key', type=str, default=None,
+                        help='Path within input h5 file; default=None')
+    parser.add_argument('--resolution', type=float, nargs=3, default=None,
+                        help='Resolution of the dataset, needs to be supplied if not using ome.zarr data')
+    parser.add_argument('--unit', type=str, default='micrometers',
+                        help='Unit of the resolution; default = "micrometers"')
     parser.add_argument('--no_autopad', action='store_true',
                         help='Switches off auto-padding')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
@@ -480,6 +504,10 @@ def snk_apply_transformation():
     no_autopad = args.no_autopad
     mem = args.mem
     runtime = args.runtime
+    stack_key = args.stack_key
+    stack_pattern = args.stack_pattern
+    resolution = args.resolution
+    unit = args.unit
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -495,11 +523,12 @@ def snk_apply_transformation():
     from squirrel.library.ome_zarr import (
         get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset
     )
-    data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key='s0', pattern=None)
+    data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], common_args['batch_size'])]
-    ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
-    resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
-    unit = get_unit_of_dataset(ome_zarr_h)
+    if resolution is None:
+        ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
+        resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
+        unit = get_unit_of_dataset(ome_zarr_h)
     dtype = str(data_h.dtype)
 
     shapes = []
@@ -538,6 +567,8 @@ def snk_apply_transformation():
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
         input_transforms_filepaths=input_transforms_filepaths,
+        stack_pattern=stack_pattern,
+        stack_key=stack_key,
         batch_ids=batch_ids,
         stack_shape=stack_shape,
         src_dirpath=src_dirpath,

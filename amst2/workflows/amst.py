@@ -9,7 +9,20 @@ def _run_amst(parameter_yaml, verbose=False):
 
     output_dirpath = parameter_dict['general']['output_dirpath']
 
+    if not os.path.exists(output_dirpath):
+        os.makedirs(output_dirpath, exist_ok=True)
+
+    if 'resolution' not in parameter_dict['general']:
+        from squirrel.library.ome_zarr import get_ome_zarr_handle, get_scale_of_downsample_level, get_unit_of_dataset
+        input_ome_zarr_filepath = parameter_dict['general']['pre_align_dirpath']
+        ome_zarr_h = get_ome_zarr_handle(input_ome_zarr_filepath, key=None, mode='r')
+        resolution = get_scale_of_downsample_level(ome_zarr_h, 0)
+        unit = get_unit_of_dataset(ome_zarr_h)
+        parameter_dict['general']['resolution'] = resolution
+        parameter_dict['general']['unit'] = unit
+
     from .lib import run_amst
+
     run_amst(
         parameter_dict,
         parameter_key='amst',
@@ -25,6 +38,8 @@ def _run_amst(parameter_yaml, verbose=False):
     pre_align_transforms = os.path.join(output_dirpath, 'nsbs-pre-align.json')
     pre_align_transforms = parameter_dict['general']['pre_align_transforms'] if 'pre_align_transforms' in parameter_dict['general'] else pre_align_transforms
     pre_align_transforms = parameter_dict[apply_amst_param_key]['pre_align_transforms'] if 'pre_align_transforms' in parameter_dict[apply_amst_param_key] else pre_align_transforms
+    input_dirpath = os.path.join(output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr')
+    input_dirpath = parameter_dict['general']['input_dirpath'] if 'input_dirpath' in parameter_dict['general'] else input_dirpath
     run_apply_transformation(
         parameter_dict,
         parameter_key=apply_amst_param_key,
@@ -32,7 +47,7 @@ def _run_amst(parameter_yaml, verbose=False):
             pre_align_transforms,
             os.path.join(output_dirpath, 'amst', 'amst.meta', 'amst')
         ],
-        input_dirpath=os.path.join(output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr'),
+        input_dirpath=input_dirpath,
         output_filename='amst.ome.zarr',
         verbose=verbose
     )
@@ -169,3 +184,75 @@ def cleanup_amst():
     _run_cleanup_amst(parameter_yaml, verbose=verbose, dryrun=dryrun)
 
 
+def get_default_parameter_file():
+
+    # Argument parsing -----------------------------------
+
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Creates a default parameter file',
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    parser.add_argument('-fp', '--output_filepath', type=str, default=None,
+                        help='Filepath of the parameter file. By default it is created in the current directory')
+    parser.add_argument('-pay', '--pre_align_yaml', type=str, default=None,
+                        help='If the pre-alignment was performed with amst2-wf-nsbs_pre_align_run, set this argument. All input filepaths will be properly set.')
+    parser.add_argument('-pi', '--param_input_dirpath', type=str, default=None,
+                        help='The parameter "general:input_dirpath" will be pre-set to this value')
+    parser.add_argument('-po', '--param_output_dirpath', type=str, default=None,
+                        help='The parameter "general:output_dirpath" will be pre-set to this value')
+    parser.add_argument('-pp', '--param_pre_align_dirpath', type=str, default=None,
+                        help='The parameter "general:pre_align_dirpath" will be pre-set to this value')
+    parser.add_argument('-ppt', '--param_pre_align_transforms', type=str, default=None,
+                        help='The parameter "general:pre_align_transforms" will be pre-set to this value')
+    parser.add_argument('-p', '--params', nargs='+', default=None,
+                        help='Specify any parameter and its value in this format:\n'
+                             '  --params group:parameter_name:value\n'
+                             '  Examples:\n'
+                             '    --params stack_to_ome_zarr:active:true general:cores:32  -> enables input ome zarr conversion and sets the number of compute cores to 32\n'
+                             '    --params general:resolution:[0.02,0.02,0.02]  -> Sets resolution to 0.02 isotropic\n'
+                             '  Note: One Item consisting of group:parameter_name:value must not contain any spaces!\n'
+                             '  Also note: You can generate any entry like this - also ones that have no effect!\n'
+                             '  The idea of having this input argument is to make a workflow fully scriptable without the requirement for manually adjusting the parameter file.')
+    parser.add_argument('--slurm', action='store_true',
+                        help='Creates the parameter file for a slurm cluster; Note that the compute settings may '
+                             'require adjustment')
+    parser.add_argument('-v', '--verbose', action='store_true')
+
+    args = parser.parse_args()
+
+    output_filepath = args.output_filepath
+    pre_align_yaml = args.pre_align_yaml
+    param_input_dirpath = args.param_input_dirpath
+    param_output_dirpath = args.param_output_dirpath
+    param_pre_align_dirpath = args.param_pre_align_dirpath
+    param_pre_align_transforms = args.param_pre_align_transforms
+    params = args.params
+    slurm = args.slurm
+    verbose = args.verbose
+
+    if pre_align_yaml is not None:
+        from amst2.workflows.lib import load_parameter_yaml
+        pre_align_dict = load_parameter_yaml(pre_align_yaml)
+        pre_align_output_dirpath = pre_align_dict['general']['output_dirpath']
+        if 'stack_to_ome_zarr' in pre_align_dict and pre_align_dict['stack_to_ome_zarr']['active']:
+            param_input_dirpath = os.path.join(pre_align_output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr')
+        else:
+            param_input_dirpath = pre_align_dict['general']['input_dirpath']
+        param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr')
+        param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json')
+
+    from amst2.workflows.lib import get_default_parameter_file_from_repo
+    get_default_parameter_file_from_repo(
+        'amst',
+        output_filepath=output_filepath,
+        param_input_dirpath=param_input_dirpath,
+        param_output_dirpath=param_output_dirpath,
+        param_pre_align_dirpath=param_pre_align_dirpath,
+        param_pre_align_transforms=param_pre_align_transforms,
+        params=params,
+        slurm=slurm,
+        verbose=verbose
+    )
