@@ -29,6 +29,7 @@ pip install -e squirrel
 pip install -e AMST2
 pip install SimpleITK-SimpleElastix
 pip install transforms3d
+mamba install -c conda-forge vigra
 mamba install -c conda-forge opencv
 mamba install -c conda-forge zarr=2.18
 ```
