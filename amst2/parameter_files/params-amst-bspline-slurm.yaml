@@ -10,6 +10,8 @@ general:
   pre_align_transforms: /path/to/pre-alignment-transforms.json  # Defaults to <output_dirpath>/nsbs-pre-align.json
   # <<<run
   output_dirpath: /path/to/target/directory
+  stack_key: s0
+  stack_pattern: '*.tif'
   cluster: slurm
   batch_size: 32
   cores: 2048

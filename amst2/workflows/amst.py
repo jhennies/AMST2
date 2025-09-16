@@ -243,6 +243,14 @@ def get_default_parameter_file():
             param_input_dirpath = pre_align_dict['general']['input_dirpath']
         param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr')
         param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json')
+        if 'stack_key' in pre_align_dict['general']:
+            if params is None:
+                params = []
+            params.append(f'general:stack_key:{pre_align_dict["general"]["stack_key"]}')
+        if 'stack_pattern' in pre_align_dict['general']:
+            if params is None:
+                params = []
+            params.append(f'general:stack_pattern:{pre_align_dict["general"]["stack_pattern"]}')
 
     from amst2.workflows.lib import get_default_parameter_file_from_repo
     get_default_parameter_file_from_repo(
