@@ -207,6 +207,10 @@ def get_default_parameter_file():
                         help='Filepath of the parameter file. By default it is created in the current directory')
     parser.add_argument('-pi', '--param_input_dirpath', type=str, default=None,
                         help='The parameter "general:input_dirpath" will be pre-set to this value')
+    parser.add_argument('-psk', '--param_stack_key', type=str, default=None,
+                        help='Stack key of the input dataset (relevant for h5, n5 or ome.zarr); Defaults to "s0"')
+    parser.add_argument('-psp', '--param_stack_pattern', type=str, default=None,
+                        help='Stack pattern of the input dataset (relevant for tif stack); Defaults to "*.tif"')
     parser.add_argument('-po', '--param_output_dirpath', type=str, default=None,
                         help='The parameter "general:output_dirpath" will be pre-set to this value')
     parser.add_argument('-p', '--params', nargs='+', default=None,
@@ -221,15 +225,22 @@ def get_default_parameter_file():
     parser.add_argument('--slurm', action='store_true',
                         help='Creates the parameter file for a slurm cluster; Note that the compute settings may '
                              'require adjustment')
+    parser.add_argument('--estimate_crop_xy', action='store_true',
+                        help='Estimates how to optimally crop the data to reduce slice size. \n'
+                             'Note that enabling this requires conversion of the input to ome.zarr')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
 
     output_filepath = args.output_filepath
     param_input_dirpath = args.param_input_dirpath
+    param_stack_key = args.param_stack_key
+    param_stack_pattern = args.param_stack_pattern
     param_output_dirpath = args.param_output_dirpath
     params = args.params
+    estimate_crop_xy = args.estimate_crop_xy
     slurm = args.slurm
+
     verbose = args.verbose
 
     from amst2.workflows.lib import get_default_parameter_file_from_repo
@@ -237,8 +248,11 @@ def get_default_parameter_file():
         'pre_align',
         output_filepath=output_filepath,
         param_input_dirpath=param_input_dirpath,
+        param_stack_key=param_stack_key,
+        param_stack_pattern=param_stack_pattern,
         param_output_dirpath=param_output_dirpath,
         params=params,
         slurm=slurm,
+        estimate_crop_xy=estimate_crop_xy,
         verbose=verbose
     )

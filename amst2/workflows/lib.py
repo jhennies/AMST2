@@ -26,7 +26,9 @@ def run_snakemake_workflow(
 
         return 1
 
-    if process.stderr.strip().split("\n")[-2].endswith("(100%) done"):
+    lines = [line.strip() for line in process.stderr.strip().splitlines() if line.strip()]
+    # if process.stderr.strip().split("\n")[-2].endswith("(100%) done"):
+    if any("(100%) done" in line for line in lines[-10:]):
         print('_____________________________________________\n')
         print(f'{wf_name} was successful!')
         print('_____________________________________________\n')
@@ -490,10 +492,13 @@ def get_default_parameter_file_from_repo(
         output_filepath=None,
         params=None,
         param_input_dirpath=None,
+        param_stack_key=None,
+        param_stack_pattern=None,
         param_output_dirpath=None,
         param_pre_align_dirpath=None,
         param_pre_align_transforms=None,
         slurm=False,
+        estimate_crop_xy=False,
         verbose=False,
 ):
     import importlib.resources as resources
@@ -524,32 +529,54 @@ def get_default_parameter_file_from_repo(
         print(f"Created parameter file at: {output_filepath}")
         print(f"(Template source: {data_path})")
 
+    if estimate_crop_xy:
+        assert param_input_dirpath is not None, 'To estimate crop_xy, input dirpath must be specified!'
+        print('Estimating crop_xy ...')
+        from squirrel.workflows.volume import estimate_crop_xy_workflow
+        crop_xy = estimate_crop_xy_workflow(
+            param_input_dirpath,
+            key=param_stack_key,
+            pattern=param_stack_pattern,
+            padding=64,
+            out_image=os.path.join(os.path.split(output_filepath)[0], 'max_projection.png'),
+            number_of_samples=16,
+            verbose=verbose
+        )
+        params = [] if params is None else params
+        params.append(f'stack_to_ome_zarr:crop_xy:{crop_xy}')
+        params.append(f'stack_to_ome_zarr:active:true')
+
     # We are done if no manually set parameters are given
-    if all(v is None for v in (
+    if any(v is None for v in (
             params,
             param_output_dirpath,
             param_input_dirpath,
+            param_stack_key,
+            param_stack_pattern,
             param_pre_align_dirpath,
             param_pre_align_transforms
     )):
-        return
 
-    params = [] if params is None else params
-    if param_input_dirpath is not None:
-        params.append(f'general:input_dirpath:{param_input_dirpath}')
-    if param_output_dirpath is not None:
-        params.append(f'general:output_dirpath:{param_output_dirpath}')
-    if param_pre_align_dirpath is not None:
-        params.append(f'general:pre_align_dirpath:{param_pre_align_dirpath}')
-    if param_pre_align_transforms is not None:
-        params.append(f'general:pre_align_transforms:{param_pre_align_transforms}')
+        params = [] if params is None else params
+        if param_input_dirpath is not None:
+            params.append(f'general:input_dirpath:{param_input_dirpath}')
+        if param_output_dirpath is not None:
+            params.append(f'general:output_dirpath:{param_output_dirpath}')
+        if param_pre_align_dirpath is not None:
+            params.append(f'general:pre_align_dirpath:{param_pre_align_dirpath}')
+        if param_pre_align_transforms is not None:
+            params.append(f'general:pre_align_transforms:{param_pre_align_transforms}')
+        if param_stack_key is not None:
+            params.append(f'general:stack_key:{param_stack_key}')
+        if param_stack_pattern is not None:
+            params.append(f'general:stack_pattern:{param_stack_pattern}')
 
-    # Decode the parameter inputs
-    params = _build_nested_dict(params)
-    if verbose:
-        print(f'params = {params}')
+        # Decode the parameter inputs
+        params = _build_nested_dict(params)
+        if verbose:
+            print(f'params = {params}')
 
-    # Update the yaml
-    merge_into_yaml_file(output_filepath, params)
+        # Update the yaml
+        merge_into_yaml_file(output_filepath, params)
 
-
+    print(f'\nParameter file successfully written to {output_filepath}')

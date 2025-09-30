@@ -24,7 +24,7 @@ stack_to_ome_zarr:
 sbs_alignment:
   auto_mask: non-zero  # non-zero or variance
   gaussian_sigma: 2.0
-  initialize_offsets_method: init_elx
+  initialize_offsets_method: init_elx  # Possible methods: none, init_xcorr, init_elx
   initialize_offsets_kwargs:
     binning: 32
     spacing: 256
