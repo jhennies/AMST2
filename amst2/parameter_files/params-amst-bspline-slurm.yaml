@@ -13,9 +13,9 @@ general:
   stack_key: s0
   stack_pattern: '*.tif'
   cluster: slurm
-  batch_size: 32
+  batch_size: 16
   cores: 2048
-  max_cores_per_task: 32
+  max_cores_per_task: 16
 
 amst:
   elastix_parameter_file: auto
@@ -23,6 +23,8 @@ amst:
   median_radius: 7
   gaussian_sigma: 2.0
   auto_mask_off: false
+  mem:
+    apply_final_transformations:16000
 
 apply_amst:
   mem:
