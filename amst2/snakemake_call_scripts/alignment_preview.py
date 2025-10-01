@@ -30,14 +30,19 @@ if __name__ == '__main__':
     print(f'meta = {transforms.get_meta()}')
     print(f'len(transforms) = {len(transforms)}')
 
-    # Downsample the transformations
-    from squirrel.library.ome_zarr import get_ome_zarr_handle, get_scale_of_downsample_level
-
-    import zarr
-    try:
-        input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
-    except zarr.errors.PathNotFoundError:
-        input_ome_zarr_fileh = None
+    from squirrel.library.io import get_filetype
+    input_filetype = get_filetype(input_ome_zarr_filepath)
+    if input_filetype == 'ome.zarr':
+        from squirrel.library.ome_zarr import get_ome_zarr_handle
+        input_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
+    else:
+        from squirrel.library.io import load_data_handle
+        input_fileh, _ = load_data_handle(input_ome_zarr_filepath, key=run_info['stack_key'], pattern=run_info['stack_pattern'])
+    # import zarr
+    # try:
+    #     input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
+    # except zarr.errors.PathNotFoundError:
+    #     input_ome_zarr_fileh = None
 
     # if not transforms.is_sequenced:
     #     transforms = transforms.get_sequenced_stack()
@@ -59,7 +64,11 @@ if __name__ == '__main__':
         if transforms.exists_meta('stack_shape'):
             stack_shape = transforms.get_meta('stack_shape')
         else:
-            stack_shape = input_ome_zarr_fileh['s0'].shape
+            if input_filetype == 'ome.zarr':
+                stack_shape = input_fileh[run_info['stack_key']].shape
+            else:
+                stack_shape = input_fileh.shape
+
     if not transforms.exists_meta('stack_shape'):
         transforms.set_meta('stack_shape', stack_shape)
 
@@ -72,10 +81,12 @@ if __name__ == '__main__':
     if save_joined_transforms:
         transforms.to_file(transforms_filepath)
 
-    if input_ome_zarr_fileh is not None:
+    if input_filetype == 'ome.zarr':
 
-        scale_full = get_scale_of_downsample_level(input_ome_zarr_fileh, 0)
-        scale_ds = get_scale_of_downsample_level(input_ome_zarr_fileh, preview_downsample_level)
+        from squirrel.library.ome_zarr import get_scale_of_downsample_level
+
+        scale_full = get_scale_of_downsample_level(input_fileh, 0)
+        scale_ds = get_scale_of_downsample_level(input_fileh, preview_downsample_level)
         scale = (np.array(scale_ds) / np.array(scale_full)).astype(int)
         assert scale[0] == scale[1] == scale[2], 'Implemented only for isotropic scaling!'
         scale = 1 / scale[0]
@@ -90,7 +101,7 @@ if __name__ == '__main__':
 
         # Apply the transformations
         from squirrel.library.transformation import apply_stack_alignment
-        input_ome_zarr_dataseth = input_ome_zarr_fileh[f's{preview_downsample_level}']
+        input_ome_zarr_dataseth = input_fileh[f's{preview_downsample_level}']
 
         result_stack = apply_stack_alignment(
             input_ome_zarr_dataseth,

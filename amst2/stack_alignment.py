@@ -352,6 +352,7 @@ def snk_elastix_stack_alignment():
         get_scale_of_downsample_level, get_ome_zarr_handle, get_unit_of_dataset
     )
     print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
+    print(f'stack_key = {stack_key}')
     data_h, shape_h = load_data_handle(input_ome_zarr_filepath, key=stack_key, pattern=stack_pattern)
     batch_ids = [x for x in range(0, shape_h[0], common_args['batch_size'])]
     if resolution is None:
