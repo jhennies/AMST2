@@ -30,7 +30,7 @@ def get_cluster_settings(sn_args, config_filepath):
     sn_args.rerun_incomplete = True
     sn_args.printshellcmds = True
     sn_args.scheduler = 'greedy'
-    sn_args.use_conda = True
+    sn_args.use_conda = False
     sn_args.verbose = False
     sn_args.quiet = False
 
