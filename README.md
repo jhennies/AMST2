@@ -23,7 +23,7 @@ git clone https://github.com/jhennies/AMST2
 Install the packages:
 ```
 cd path/to/src
-mamba create -n amst2-env -c conda-forge -c bioconda python=3.11 snakemake=8
+mamba create -n amst2-env -c conda-forge -c bioconda python=3.11 snakemake=8.27
 conda activate amst2-env
 pip install -e squirrel
 pip install -e AMST2
@@ -31,7 +31,7 @@ pip install SimpleITK-SimpleElastix
 pip install transforms3d
 mamba install -c conda-forge vigra
 mamba install -c conda-forge opencv
-mamba install -c conda-forge zarr=2.18
+mamba install -c conda-forge zarr=2
 ```
 
 To use a slurm cluster:

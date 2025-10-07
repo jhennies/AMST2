@@ -34,6 +34,7 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     if not os.path.exists(os.path.join(output_dirpath, 'sbs_alignment', 'sbs_alignment.done')):
         return
 
+    parameter_dict['nsbs_alignment']['stack_key'] = 's0'
     from .lib import run_nsbs_alignment
     run_nsbs_alignment(
         parameter_dict, parameter_key='nsbs_alignment',
@@ -56,12 +57,19 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     )
     if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json')):
         return
-    from squirrel.workflows.transformation import apply_auto_pad_workflow
-    apply_auto_pad_workflow(
-        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
-        os.path.join(output_dirpath, 'nsbs-pre-align.json'),
-        verbose=verbose
-    )
+    if parameter_dict['general']['auto_pad']:
+        from squirrel.workflows.transformation import apply_auto_pad_workflow
+        apply_auto_pad_workflow(
+            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
+            os.path.join(output_dirpath, 'nsbs-pre-align.json'),
+            verbose=verbose
+        )
+    else:
+        import shutil
+        shutil.copy(
+            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
+            os.path.join(output_dirpath, 'nsbs-pre-align.json')
+        )
     if not os.path.exists(os.path.join(output_dirpath, 'nsbs-pre-align.json')):
         return
 

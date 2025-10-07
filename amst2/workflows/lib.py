@@ -182,7 +182,7 @@ def run_nsbs_alignment(
         f"{'--auto_mask {}'.format(this_param_dict['auto_mask']) if 'auto_mask' in this_param_dict else ''} "
         f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
         f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
-        f"{'--auto_pad' if 'auto_pad' in this_param_dict else ''} "
+        f"{'--auto_pad' if 'auto_pad' in this_param_dict and this_param_dict['auto_pad'] else ''} "
         f"--preview_downsample_level {this_param_dict['preview_downsample_level'] if 'preview_downsample_level' in this_param_dict else 2} "
         f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
         f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
@@ -260,6 +260,7 @@ def run_apply_transformation(
         f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
         f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
         f"{'-v' if verbose else ''} "
+        f"--no_autopad "
         "--continue_run"
     )
 

@@ -25,7 +25,7 @@ stack_to_ome_zarr:
 sbs_alignment:
   auto_mask: non-zero  # non-zero or variance
   gaussian_sigma: 2.0
-  initialize_offsets_method: init_elx
+  initialize_offsets_method: init_elx  # Possible methods: none, init_xcorr, init_elx
   initialize_offsets_kwargs:
     binning: 32
     spacing: 256
@@ -40,7 +40,7 @@ sbs_alignment:
     elastix_stack_alignment: 60
   mem:
     elastix_stack_alignment: 16000
-    apply_final_transform: 16000
+    apply_final_transformations: 16000
 
 nsbs_alignment:
   z_step: 8  # Adjust the z-step if needed
@@ -55,7 +55,7 @@ nsbs_alignment:
 
 apply_pre_align:
   mem:
-    apply_final_transform: 16000
+    apply_final_transformations: 16000
 
 pre_align_to_tif_stack:
   # Set to true if you prefer a tiff stack output
