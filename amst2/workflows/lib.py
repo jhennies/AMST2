@@ -26,7 +26,9 @@ def run_snakemake_workflow(
 
         return 1
 
-    if process.stderr.strip().split("\n")[-2].endswith("(100%) done"):
+    lines = [line.strip() for line in process.stderr.strip().splitlines() if line.strip()]
+    # if process.stderr.strip().split("\n")[-2].endswith("(100%) done"):
+    if any("(100%) done" in line for line in lines[-10:]):
         print('_____________________________________________\n')
         print(f'{wf_name} was successful!')
         print('_____________________________________________\n')
