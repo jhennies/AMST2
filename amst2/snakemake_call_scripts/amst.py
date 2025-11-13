@@ -30,5 +30,6 @@ if __name__ == '__main__':
         elastix_parameters=run_info['elastix_parameter_file'],
         z_range=z_range,
         quiet=False,
+        n_workers=run_info['max_cores_per_task'],
         verbose=verbose
     )
