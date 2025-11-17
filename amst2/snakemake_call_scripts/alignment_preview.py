@@ -32,6 +32,9 @@ if __name__ == '__main__':
 
     from squirrel.library.io import get_filetype
     input_filetype = get_filetype(input_ome_zarr_filepath)
+    if verbose:
+        print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
+        print(f'input_filetype = {input_filetype}')
     if input_filetype == 'ome.zarr':
         from squirrel.library.ome_zarr import get_ome_zarr_handle
         input_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
