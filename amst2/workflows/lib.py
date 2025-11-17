@@ -549,7 +549,7 @@ def get_default_parameter_file_from_repo(
         params.append(f'stack_to_ome_zarr:active:true')
 
     # We are done if no manually set parameters are given
-    if not any(v is None for v in (
+    if not all(v is None for v in (
             params,
             param_output_dirpath,
             param_input_dirpath,
