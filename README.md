@@ -23,7 +23,7 @@ git clone https://github.com/jhennies/AMST2
 Install the packages:
 ```
 cd path/to/src
-mamba create -n amst2-env -c conda-forge -c bioconda python=3.11 snakemake=8.27
+mamba create -n amst2-env -c bioconda -c conda-forge python=3.11 snakemake=8.27
 conda activate amst2-env
 pip install -e squirrel
 pip install -e AMST2

@@ -498,6 +498,7 @@ def get_default_parameter_file_from_repo(
         param_output_dirpath=None,
         param_pre_align_dirpath=None,
         param_pre_align_transforms=None,
+        param_initialize_offset_method=None,
         slurm=False,
         estimate_crop_xy=False,
         verbose=False,
@@ -548,14 +549,15 @@ def get_default_parameter_file_from_repo(
         params.append(f'stack_to_ome_zarr:active:true')
 
     # We are done if no manually set parameters are given
-    if any(v is None for v in (
+    if not any(v is None for v in (
             params,
             param_output_dirpath,
             param_input_dirpath,
             param_stack_key,
             param_stack_pattern,
             param_pre_align_dirpath,
-            param_pre_align_transforms
+            param_pre_align_transforms,
+            param_initialize_offset_method
     )):
 
         params = [] if params is None else params
@@ -571,6 +573,20 @@ def get_default_parameter_file_from_repo(
             params.append(f'general:stack_key:{param_stack_key}')
         if param_stack_pattern is not None:
             params.append(f'general:stack_pattern:{param_stack_pattern}')
+        if param_initialize_offset_method is not None:
+            params.append(f'sbs_alignment:initialize_offsets_method:{param_initialize_offset_method}')
+
+        if param_initialize_offset_method is not None:
+            if param_initialize_offset_method == 'none':
+                elx_no_of_resolutions: 4
+                elx_max_number_of_its: 512
+            if param_initialize_offset_method in ['init_elx', 'init_xcorr']:
+                elx_no_of_resolutions: 2
+                elx_max_number_of_its: 256
+            if not any(item.startswith('sbs_alignment:elx_number_of_resolutions:') for item in params):
+                params.append(f'sbs_alignment:elx_number_of_resolutions:{elx_no_of_resolutions}')
+            if not any(item.startswith('sbs_alignment:elx_maximum_number_of_iterations:') for item in params):
+                params.append(f'sbs_alignment:elx_maximum_number_of_iterations:{elx_max_number_of_its}')
 
         # Decode the parameter inputs
         params = _build_nested_dict(params)

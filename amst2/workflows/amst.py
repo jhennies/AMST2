@@ -251,6 +251,10 @@ def get_default_parameter_file():
             if params is None:
                 params = []
             params.append(f'general:stack_pattern:{pre_align_dict["general"]["stack_pattern"]}')
+        if 'resolution' in pre_align_dict['general']:
+            if params is None:
+                params = []
+            params.append(f'general:resolution:{pre_align_dict["general"]["resolution"].join(",")}')
 
     from amst2.workflows.lib import get_default_parameter_file_from_repo
     get_default_parameter_file_from_repo(
