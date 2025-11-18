@@ -172,6 +172,7 @@ def run_nsbs_alignment(
         f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
         f"-out-oz-fn {'nsbs' if 'z_step' in this_param_dict and this_param_dict['z_step'] > 1 else 'sbs'}.ome.zarr "
         f"--z_step {this_param_dict['z_step'] if 'z_step' in this_param_dict else 1} "
+        f"{'--average_for_z_step' if 'average_for_z_step' not in this_param_dict or this_param_dict['average_for_z_step'] else ''} "
         f"--gaussian_sigma {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
         f"{'--elx_number_of_resolutions {}'.format(this_param_dict['elx_number_of_resolutions']) if 'elx_number_of_resolutions' in this_param_dict else ''} "
         f"{'--elx_number_of_spatial_samples {}'.format(this_param_dict['elx_number_of_spatial_samples']) if 'elx_number_of_spatial_samples' in this_param_dict else ''} "
