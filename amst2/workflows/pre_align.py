@@ -221,6 +221,12 @@ def get_default_parameter_file():
                         help='Stack pattern of the input dataset (relevant for tif stack); Defaults to "*.tif"')
     parser.add_argument('-po', '--param_output_dirpath', type=str, default=None,
                         help='The parameter "general:output_dirpath" will be pre-set to this value')
+    parser.add_argument('-piom', '--param_initialize_offset_method', type=str, default=None,
+                        help='Specify the method used for initialization of offsets; '
+                             'possible values = ["none", "init_xcorr", "init_elx"]; default="init_elx"\n'
+                             '  Note: This will additionally also adjust the following parameters:\n'
+                             '    - sbs_alignment:elx_number_of_resolutions\n'
+                             '    - sbs_alignment:elx_maximum_number_of_iterations')
     parser.add_argument('-p', '--params', nargs='+', default=None,
                         help='Specify any parameter and its value in this format:\n'
                              '  --params group:parameter_name:value\n'
@@ -245,6 +251,7 @@ def get_default_parameter_file():
     param_stack_key = args.param_stack_key
     param_stack_pattern = args.param_stack_pattern
     param_output_dirpath = args.param_output_dirpath
+    param_initialize_offset_method = args.param_initialize_offset_method
     params = args.params
     estimate_crop_xy = args.estimate_crop_xy
     slurm = args.slurm
@@ -259,6 +266,7 @@ def get_default_parameter_file():
         param_stack_key=param_stack_key,
         param_stack_pattern=param_stack_pattern,
         param_output_dirpath=param_output_dirpath,
+        param_initialize_offset_method=param_initialize_offset_method,
         params=params,
         slurm=slurm,
         estimate_crop_xy=estimate_crop_xy,

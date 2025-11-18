@@ -172,6 +172,7 @@ def run_nsbs_alignment(
         f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
         f"-out-oz-fn {'nsbs' if 'z_step' in this_param_dict and this_param_dict['z_step'] > 1 else 'sbs'}.ome.zarr "
         f"--z_step {this_param_dict['z_step'] if 'z_step' in this_param_dict else 1} "
+        f"{'--average_for_z_step' if 'average_for_z_step' not in this_param_dict or this_param_dict['average_for_z_step'] else ''} "
         f"--gaussian_sigma {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
         f"{'--elx_number_of_resolutions {}'.format(this_param_dict['elx_number_of_resolutions']) if 'elx_number_of_resolutions' in this_param_dict else ''} "
         f"{'--elx_number_of_spatial_samples {}'.format(this_param_dict['elx_number_of_spatial_samples']) if 'elx_number_of_spatial_samples' in this_param_dict else ''} "
@@ -347,13 +348,7 @@ def run_amst(
         from squirrel.workflows.elastix import make_elastix_default_parameter_file_workflow
         make_elastix_default_parameter_file_workflow(
             os.path.join(output_dirpath, 'amst-elastix-params.txt'),
-            transform=this_param_dict['transform'],
-            elastix_parameters=[
-                'FinalGridSpacingInPhysicalUnits:256',
-                'GridSpacingSchedule:4.0,3.0,2.0,1.0',
-                'MaximumStepLength:0.5',
-                'MaximumNumberOfIterations:1024'
-            ],
+            transform=f'amst-{this_param_dict["transform"]}',
             verbose=verbose
         )
         this_param_dict['elastix_parameter_file'] = os.path.join(output_dirpath, 'amst-elastix-params.txt')
@@ -371,6 +366,7 @@ def run_amst(
         f"--transform {this_param_dict['transform']} "
         f"--elastix_parameter_file {this_param_dict['elastix_parameter_file']} "
         f"-mr {this_param_dict['median_radius']} "
+        f"{'-zm {}'.format(this_param_dict['z_smooth_method']) if 'z_smooth_method' in this_param_dict else ''} "
         f"-gs {this_param_dict['gaussian_sigma']} "
         f"-out-oz-fn amst.ome.zarr "
         f"{'--auto_mask_off' if 'auto_mask_off' in this_param_dict and this_param_dict['auto_mask_off'] else ''} "
@@ -498,6 +494,7 @@ def get_default_parameter_file_from_repo(
         param_output_dirpath=None,
         param_pre_align_dirpath=None,
         param_pre_align_transforms=None,
+        param_initialize_offset_method=None,
         slurm=False,
         estimate_crop_xy=False,
         verbose=False,
@@ -548,14 +545,15 @@ def get_default_parameter_file_from_repo(
         params.append(f'stack_to_ome_zarr:active:true')
 
     # We are done if no manually set parameters are given
-    if any(v is None for v in (
+    if not all(v is None for v in (
             params,
             param_output_dirpath,
             param_input_dirpath,
             param_stack_key,
             param_stack_pattern,
             param_pre_align_dirpath,
-            param_pre_align_transforms
+            param_pre_align_transforms,
+            param_initialize_offset_method
     )):
 
         params = [] if params is None else params
@@ -571,6 +569,20 @@ def get_default_parameter_file_from_repo(
             params.append(f'general:stack_key:{param_stack_key}')
         if param_stack_pattern is not None:
             params.append(f'general:stack_pattern:{param_stack_pattern}')
+        if param_initialize_offset_method is not None:
+            params.append(f'sbs_alignment:initialize_offsets_method:{param_initialize_offset_method}')
+
+        if param_initialize_offset_method is not None:
+            if param_initialize_offset_method == 'none':
+                elx_no_of_resolutions: 4
+                elx_max_number_of_its: 512
+            if param_initialize_offset_method in ['init_elx', 'init_xcorr']:
+                elx_no_of_resolutions: 2
+                elx_max_number_of_its: 256
+            if not any(item.startswith('sbs_alignment:elx_number_of_resolutions:') for item in params):
+                params.append(f'sbs_alignment:elx_number_of_resolutions:{elx_no_of_resolutions}')
+            if not any(item.startswith('sbs_alignment:elx_maximum_number_of_iterations:') for item in params):
+                params.append(f'sbs_alignment:elx_maximum_number_of_iterations:{elx_max_number_of_its}')
 
         # Decode the parameter inputs
         params = _build_nested_dict(params)

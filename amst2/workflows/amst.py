@@ -238,11 +238,11 @@ def get_default_parameter_file():
         pre_align_dict = load_parameter_yaml(pre_align_yaml)
         pre_align_output_dirpath = pre_align_dict['general']['output_dirpath']
         if 'stack_to_ome_zarr' in pre_align_dict and pre_align_dict['stack_to_ome_zarr']['active']:
-            param_input_dirpath = os.path.join(pre_align_output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr')
+            param_input_dirpath = os.path.join(pre_align_output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr') if param_input_dirpath is None else param_input_dirpath
         else:
-            param_input_dirpath = pre_align_dict['general']['input_dirpath']
-        param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr')
-        param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json')
+            param_input_dirpath = pre_align_dict['general']['input_dirpath'] if param_input_dirpath is None else param_input_dirpath
+        param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr') if param_pre_align_dirpath is None else param_pre_align_dirpath
+        param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json') if param_pre_align_transforms is None else param_pre_align_transforms
         if 'stack_key' in pre_align_dict['general']:
             if params is None:
                 params = []
@@ -251,6 +251,10 @@ def get_default_parameter_file():
             if params is None:
                 params = []
             params.append(f'general:stack_pattern:{pre_align_dict["general"]["stack_pattern"]}')
+        if 'resolution' in pre_align_dict['general']:
+            if params is None:
+                params = []
+            params.append(f'general:resolution:[{",".join([str(x) for x in pre_align_dict["general"]["resolution"]])}]')
 
     from amst2.workflows.lib import get_default_parameter_file_from_repo
     get_default_parameter_file_from_repo(

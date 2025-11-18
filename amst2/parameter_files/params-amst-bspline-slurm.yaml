@@ -24,11 +24,11 @@ amst:
   gaussian_sigma: 2.0
   auto_mask_off: false
   mem:
-    apply_final_transformations:16000
+    apply_final_transformations: 16000
 
 apply_amst:
   mem:
-    apply_final_transform: 16000
+    apply_final_transformations: 16000
 
 amst_to_tif_stack:
   active: false
