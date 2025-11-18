@@ -348,13 +348,7 @@ def run_amst(
         from squirrel.workflows.elastix import make_elastix_default_parameter_file_workflow
         make_elastix_default_parameter_file_workflow(
             os.path.join(output_dirpath, 'amst-elastix-params.txt'),
-            transform=this_param_dict['transform'],
-            elastix_parameters=[
-                'FinalGridSpacingInPhysicalUnits:256',
-                'GridSpacingSchedule:4.0,3.0,2.0,1.0',
-                'MaximumStepLength:0.5',
-                'MaximumNumberOfIterations:1024'
-            ],
+            transform=f'amst-{this_param_dict["transform"]}',
             verbose=verbose
         )
         this_param_dict['elastix_parameter_file'] = os.path.join(output_dirpath, 'amst-elastix-params.txt')
@@ -372,6 +366,7 @@ def run_amst(
         f"--transform {this_param_dict['transform']} "
         f"--elastix_parameter_file {this_param_dict['elastix_parameter_file']} "
         f"-mr {this_param_dict['median_radius']} "
+        f"{'-zm {}'.format(this_param_dict['z_smooth_method']) if 'z_smooth_method' in this_param_dict else ''} "
         f"-gs {this_param_dict['gaussian_sigma']} "
         f"-out-oz-fn amst.ome.zarr "
         f"{'--auto_mask_off' if 'auto_mask_off' in this_param_dict and this_param_dict['auto_mask_off'] else ''} "
