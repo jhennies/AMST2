@@ -246,13 +246,11 @@ def get_default_parameter_file():
         if 'stack_key' in pre_align_dict['general']:
             if params is None:
                 params = []
-            if 'stack_key' not in pre_align_dict['general']:
-                params.append(f'general:stack_key:{pre_align_dict["general"]["stack_key"]}')
+            params.append(f'general:stack_key:{pre_align_dict["general"]["stack_key"]}')
         if 'stack_pattern' in pre_align_dict['general']:
             if params is None:
                 params = []
-            if 'stack_pattern' not in pre_align_dict['general']:
-                params.append(f'general:stack_pattern:{pre_align_dict["general"]["stack_pattern"]}')
+            params.append(f'general:stack_pattern:{pre_align_dict["general"]["stack_pattern"]}')
         if 'resolution' in pre_align_dict['general']:
             if params is None:
                 params = []
