@@ -207,7 +207,7 @@ def run_nsbs_alignment(
     args.append(f'--downsample_type {this_param_dict["downsample_type"] if "downsample_type" in this_param_dict else "Sample"}')
     args.append(f'--downsample_factors {" ".join(this_param_dict["downsample_factors"]) if "downsample_factors" in this_param_dict else "2 2 2 2 2"}')
     if 'auto_pad' in this_param_dict and this_param_dict['auto_pad']:
-        args.append(f'--auto_pad {this_param_dict["auto_pad"]}')
+        args.append('--auto_pad')
     if 'preview_downsample_level' in this_param_dict:
         args.append(f'--preview_downsample_level {this_param_dict["preview_downsample_level"]}')
     if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm':
