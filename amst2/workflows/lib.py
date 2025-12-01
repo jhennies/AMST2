@@ -179,6 +179,8 @@ def run_nsbs_alignment(
         args.append(f'--stack_key {this_param_dict["stack_key"]}')
     if 'stack_pattern' in this_param_dict:
         args.append(f'--stack_pattern "{this_param_dict["stack_pattern"]}"')
+    if 'transform' in this_param_dict:
+        args.append(f'--transform {this_param_dict["transform"]}')
     if 'resolution' in this_param_dict:
         args.append(f'--resolution {" ".join([str(x) for x in this_param_dict["resolution"]])}')
     if 'unit' in this_param_dict:
