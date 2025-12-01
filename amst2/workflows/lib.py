@@ -102,27 +102,37 @@ def run_stack_to_ome_zarr(
     mem_str = get_resource_str(this_param_dict, 'mem')
     runtime_str = get_resource_str(this_param_dict, 'runtime')
 
-    run_script = (
-        "amst2-stack_to_ome_zarr "
-        f"{this_param_dict['input_dirpath']} "
-        f"{output_dirpath} "
-        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
-        f'--stack_pattern "{this_param_dict["stack_pattern"]}" ' if "stack_pattern" in this_param_dict else ""
-        f"-out-oz-fn input-raw.ome.zarr "
-        f"--resolution {' '.join([str(x) for x in this_param_dict['resolution']])} "
-        f"--unit {this_param_dict['unit']} "
-        f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
-        f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
-        f"{'--crop_xy {}'.format(' '.join([str(x) for x in this_param_dict['crop_xy']])) if 'crop_xy' in this_param_dict else ''} "
-        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
-        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
-        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
-        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
-        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
-        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
-        f"{'-v' if verbose else ''} "
-        "--continue_run"
-    )
+    args = []
+    args.append(f'{this_param_dict["input_dirpath"]}')
+    args.append(f'{output_dirpath}')
+    if 'stack_key' in this_param_dict:
+        args.append(f'--stack_key {this_param_dict["stack_key"]}')
+    if 'stack_pattern' in this_param_dict:
+        args.append(f'--stack_pattern "{this_param_dict["stack_pattern"]}"')
+    args.append('-out-oz-fn input-raw.ome.zarr')
+    args.append(f'--resolution {" ".join([str(x) for x in this_param_dict["resolution"]])}')
+    args.append(f'--unit {this_param_dict["unit"]}')
+    args.append(f'--downsample_type {this_param_dict["downsample_type"] if "downsample_type" in this_param_dict else "Sample"}')
+    args.append(f'--downsample_factors {" ".join(this_param_dict["downsample_factors"]) if "downsample_factors" in this_param_dict else "2 2 2 2 2"}')
+    if 'crop_xy' in this_param_dict:
+        args.append(f'--crop_xy {" ".join([str(x) for x in this_param_dict["crop_xy"]])}')
+    if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm':
+        args.append('--cluster slurm')
+    if 'cores' in this_param_dict:
+        args.append(f'--cores {this_param_dict["cores"]}')
+    else:
+        args.append(f'--cores {2048 if "cluster" in this_param_dict and this_param_dict["cluster"] == "Slurm" else 16}')
+    args.append(f'--batch_size {this_param_dict["batch_size"] if "batch_size" in this_param_dict else 32}')
+    args.append(f'--max_cores_per_task {this_param_dict["max_cores_per_task"] if "max_cores_per_task" in this_param_dict else this_param_dict["batch_size"] if "batch_size" in this_param_dict else min(this_param_dict["cores"], 32)}')
+    if 'mem' in this_param_dict:
+        args.append(f'--mem {mem_str}')
+    if 'runtime' in this_param_dict:
+        args.append(f'--runtime {runtime_str}')
+    if verbose:
+        args.append('-v')
+    args.append('--continue_run')
+
+    run_script = f'amst2-stack_to_ome_zarr {" ".join(args)}'
 
     print(run_script)
 
@@ -162,38 +172,61 @@ def run_nsbs_alignment(
     if input_dirpath is None:
         input_dirpath = f"{this_param_dict['input_dirpath']} "
 
-    run_script = (
-        "amst2-elastix_stack_alignment "
-        f"{input_dirpath} "
-        f"{output_dirpath} "
-        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
-        f'--stack_pattern "{this_param_dict["stack_pattern"]}" ' if "stack_pattern" in this_param_dict else ""
-        f"{'--resolution {}'.format(' '.join([str(x) for x in this_param_dict['resolution']])) if 'resolution' in this_param_dict else ''} "
-        f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
-        f"-out-oz-fn {'nsbs' if 'z_step' in this_param_dict and this_param_dict['z_step'] > 1 else 'sbs'}.ome.zarr "
-        f"--z_step {this_param_dict['z_step'] if 'z_step' in this_param_dict else 1} "
-        f"{'--average_for_z_step' if 'average_for_z_step' not in this_param_dict or this_param_dict['average_for_z_step'] else ''} "
-        f"--gaussian_sigma {this_param_dict['gaussian_sigma'] if 'gaussian_sigma' in this_param_dict else 0.0} "
-        f"{'--elx_number_of_resolutions {}'.format(this_param_dict['elx_number_of_resolutions']) if 'elx_number_of_resolutions' in this_param_dict else ''} "
-        f"{'--elx_number_of_spatial_samples {}'.format(this_param_dict['elx_number_of_spatial_samples']) if 'elx_number_of_spatial_samples' in this_param_dict else ''} "
-        f"{'--elx_maximum_number_of_iterations {}'.format(this_param_dict['elx_maximum_number_of_iterations']) if 'elx_maximum_number_of_iterations' in this_param_dict else ''} "
-        f"{'--initialize_offsets_method {}'.format(this_param_dict['initialize_offsets_method']) if 'initialize_offsets_method' in this_param_dict else ''} "
-        f"{'--initialize_offsets_kwargs {}'.format(init_offsets_kwargs_str) if 'initialize_offsets_kwargs' in this_param_dict else ''} "
-        f"{'--apply_final' if 'apply_final' in this_param_dict and this_param_dict['apply_final'] else ''} "
-        f"{'--auto_mask {}'.format(this_param_dict['auto_mask']) if 'auto_mask' in this_param_dict else ''} "
-        f"--downsample_type {this_param_dict['downsample_type'] if 'downsample_type' in this_param_dict else 'Sample'} "
-        f"--downsample_factors {' '.join(this_param_dict['downsample_factors']) if 'downsample_factors' in this_param_dict else '2 2 2 2 2'} "
-        f"{'--auto_pad' if 'auto_pad' in this_param_dict and this_param_dict['auto_pad'] else ''} "
-        f"--preview_downsample_level {this_param_dict['preview_downsample_level'] if 'preview_downsample_level' in this_param_dict else 2} "
-        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
-        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
-        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
-        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
-        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
-        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
-        f"{'-v' if verbose else ''} "
-        "--continue_run"
-    )
+    args = []
+    args.append(f'{input_dirpath}')
+    args.append(f'{output_dirpath}')
+    if 'stack_key' in this_param_dict:
+        args.append(f'--stack_key {this_param_dict["stack_key"]}')
+    if 'stack_pattern' in this_param_dict:
+        args.append(f'--stack_pattern "{this_param_dict["stack_pattern"]}"')
+    if 'resolution' in this_param_dict:
+        args.append(f'--resolution {" ".join([str(x) for x in this_param_dict["resolution"]])}')
+    if 'unit' in this_param_dict:
+        args.append(f'--unit {this_param_dict["unit"]}')
+    args.append(f'-out-oz-fn {"nsbs" if "z_step" in this_param_dict and this_param_dict["z_step"] > 1 else "sbs"}.ome.zarr')
+    if 'z_step' in this_param_dict:
+        args.append(f'--z_step {this_param_dict["z_step"]}')
+    if 'average_for_z_step' not in this_param_dict or this_param_dict['average_for_z_step']:
+        args.append('--average_for_z_step')
+    if 'gaussian_sigma' in this_param_dict:
+        args.append(f'--gaussian_sigma {this_param_dict["gaussian_sigma"]}')
+    if 'elx_number_of_resolutions' in this_param_dict:
+        args.append(f'--elx_number_of_resolutions {this_param_dict["elx_number_of_resolutions"]}')
+    if 'elx_number_of_spatial_samples' in this_param_dict:
+        args.append(f'--elx_number_of_spatial_samples {this_param_dict["elx_number_of_spatial_samples"]}')
+    if 'elx_maximum_number_of_iterations' in this_param_dict:
+        args.append(f'--elx_maximum_number_of_iterations {this_param_dict["elx_maximum_number_of_iterations"]}')
+    if 'initialize_offsets_method' in this_param_dict:
+        args.append(f'--initialize_offsets_method {this_param_dict["initialize_offsets_method"]}')
+    if 'initialize_offsets_kwargs' in this_param_dict:
+        args.append(f'--initialize_offsets_kwargs {init_offsets_kwargs_str}')
+    if 'apply_final' in this_param_dict and this_param_dict['apply_final']:
+        args.append(f'--apply_final {this_param_dict["apply_final"]}')
+    if 'auto_mask' in this_param_dict:
+        args.append(f'--auto_mask {this_param_dict["auto_mask"]}')
+    args.append(f'--downsample_type {this_param_dict["downsample_type"] if "downsample_type" in this_param_dict else "Sample"}')
+    args.append(f'--downsample_factors {" ".join(this_param_dict["downsample_factors"]) if "downsample_factors" in this_param_dict else "2 2 2 2 2"}')
+    if 'auto_pad' in this_param_dict and this_param_dict['auto_pad']:
+        args.append(f'--auto_pad {this_param_dict["auto_pad"]}')
+    if 'preview_downsample_level' in this_param_dict:
+        args.append(f'--preview_downsample_level {this_param_dict["preview_downsample_level"]}')
+    if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm':
+        args.append('--cluster slurm')
+    if 'cores' in this_param_dict:
+        args.append(f'--cores {this_param_dict["cores"]}')
+    else:
+        args.append(f'--cores {2048 if "cluster" in this_param_dict and this_param_dict["cluster"] == "Slurm" else 16}')
+    args.append(f'--batch_size {this_param_dict["batch_size"] if "batch_size" in this_param_dict else 32}')
+    args.append(f'--max_cores_per_task {this_param_dict["max_cores_per_task"] if "max_cores_per_task" in this_param_dict else this_param_dict["batch_size"] if "batch_size" in this_param_dict else min(this_param_dict["cores"], 32)}')
+    if 'mem' in this_param_dict:
+        args.append(f'--mem {mem_str}')
+    if 'runtime' in this_param_dict:
+        args.append(f'--runtime {runtime_str}')
+    if verbose:
+        args.append('-v')
+    args.append('--continue_run')
+
+    run_script = f'amst2-elastix_stack_alignment {" ".join(args)}'
 
     print(run_script)
 
@@ -230,40 +263,43 @@ def run_apply_transformation(
         input_dirpath = f"{this_param_dict['input_dirpath']} "
 
     if verbose:
-        # print(f'checking input dirpath for applying transformation ...')
         print(this_param_dict)
-    # if 'input_dirpath' in this_param_dict:
-    #     from squirrel.library.io import get_filetype
-    #     if get_filetype(this_param_dict['input_dirpath']) == 'ome_zarr':
-    #         input_dirpath = this_param_dict['input_dirpath']
-    #     else:
-    #         if verbose:
-    #             print(f"filetype of input_dirpath is {get_filetype(this_param_dict['input_dirpath'])}")
-    #             print(f"  ... using '{input_dirpath}' instead")
 
     if type(transforms_filepath) == list or type(transforms_filepath) == tuple:
         transforms_filepath = ' '.join(transforms_filepath)
 
-    run_script = (
-        "amst2-apply_transformation "
-        f"{input_dirpath} "
-        f"{transforms_filepath} "
-        f"{output_dirpath} "
-        f"{'--stack_key {}'.format(this_param_dict['stack_key']) if 'stack_key' in this_param_dict else ''} "
-        f'--stack_pattern "{this_param_dict["stack_pattern"]}" ' if "stack_pattern" in this_param_dict else ""
-        f"{'--resolution {}'.format(' '.join([str(x) for x in this_param_dict['resolution']])) if 'resolution' in this_param_dict else ''} "
-        f"{'--unit {}'.format(this_param_dict['unit']) if 'unit' in this_param_dict else ''} "
-        f"{'-out-oz-fn {}'.format(output_filename) if output_filename is not None else ''} "
-        f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "
-        f"--cores {this_param_dict['cores'] if 'cores' in this_param_dict else 2048} "
-        f"--batch_size {this_param_dict['batch_size'] if 'batch_size' in this_param_dict else 32} "
-        f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
-        f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
-        f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
-        f"{'-v' if verbose else ''} "
-        f"--no_autopad "
-        "--continue_run"
-    )
+    args = []
+    args.append(f'{input_dirpath}')
+    args.append(f'{transforms_filepath}')
+    args.append(f'{output_dirpath}')
+    if 'stack_key' in this_param_dict:
+        args.append(f'--stack_key {this_param_dict["stack_key"]}')
+    if 'stack_pattern' in this_param_dict:
+        args.append(f'--stack_pattern "{this_param_dict["stack_pattern"]}"')
+    if 'resolution' in this_param_dict:
+        args.append(f'--resolution {" ".join([str(x) for x in this_param_dict["resolution"]])}')
+    if 'unit' in this_param_dict:
+        args.append(f'--unit {this_param_dict["unit"]}')
+    if output_filename is not None:
+        args.append(f'-out-oz-fn {output_filename}')
+    if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm':
+        args.append('--cluster slurm')
+    if 'cores' in this_param_dict:
+        args.append(f'--cores {this_param_dict["cores"]}')
+    else:
+        args.append(f'--cores {2048 if "cluster" in this_param_dict and this_param_dict["cluster"] == "Slurm" else 16}')
+    args.append(f'--batch_size {this_param_dict["batch_size"] if "batch_size" in this_param_dict else 32}')
+    args.append(f'--max_cores_per_task {this_param_dict["max_cores_per_task"] if "max_cores_per_task" in this_param_dict else this_param_dict["batch_size"] if "batch_size" in this_param_dict else min(this_param_dict["cores"], 32)}')
+    if 'mem' in this_param_dict:
+        args.append(f'--mem {mem_str}')
+    if 'runtime' in this_param_dict:
+        args.append(f'--runtime {runtime_str}')
+    if verbose:
+        args.append('-v')
+    args.append('--no_autopad')
+    args.append('--continue_run')
+
+    run_script = f'amst2-apply_transformation {" ".join(args)}'
 
     print(run_script)
 
