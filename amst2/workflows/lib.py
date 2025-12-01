@@ -202,8 +202,8 @@ def run_nsbs_alignment(
         args.append(f'--initialize_offsets_kwargs {init_offsets_kwargs_str}')
     if 'apply_final' in this_param_dict and this_param_dict['apply_final']:
         args.append('--apply_final')
-    if 'auto_mask' in this_param_dict and this_param_dict['auto_mask']:
-        args.append('--auto_mask')
+    if 'auto_mask' in this_param_dict:
+        args.append(f'--auto_mask {this_param_dict["auto_mask"]}')
     args.append(f'--downsample_type {this_param_dict["downsample_type"] if "downsample_type" in this_param_dict else "Sample"}')
     args.append(f'--downsample_factors {" ".join(this_param_dict["downsample_factors"]) if "downsample_factors" in this_param_dict else "2 2 2 2 2"}')
     if 'auto_pad' in this_param_dict and this_param_dict['auto_pad']:
