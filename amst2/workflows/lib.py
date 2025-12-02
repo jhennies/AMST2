@@ -540,6 +540,20 @@ def get_default_parameter_file_from_repo(
     import importlib.resources as resources
     import shutil
 
+    if verbose:
+        print(f'workflow = {workflow}')
+        print(f'output_filepath = {output_filepath}')
+        print(f'params = {params}')
+        print(f'param_input_dirpath = {param_input_dirpath}')
+        print(f'param_stack_key = {param_stack_key}')
+        print(f'param_stack_pattern = {param_stack_pattern}')
+        print(f'param_output_dirpath = {param_output_dirpath}')
+        print(f'param_pre_align_dirpath = {param_pre_align_dirpath}')
+        print(f'param_pre_align_transforms = {param_pre_align_transforms}')
+        print(f'param_initialize_offset_method = {param_initialize_offset_method}')
+        print(f'slurm = {slurm}')
+        print(f'estimate_crop_xy = {estimate_crop_xy}')
+
     if workflow not in ['pre_align', 'amst']:
         raise ValueError(f'Invalid workflow name: {workflow}; valid workflows: ["pre_align", "amst"]')
 
@@ -611,12 +625,11 @@ def get_default_parameter_file_from_repo(
             params.append(f'sbs_alignment:initialize_offsets_method:{param_initialize_offset_method}')
 
         if param_initialize_offset_method is not None:
-            if param_initialize_offset_method == 'none':
-                elx_no_of_resolutions: 4
-                elx_max_number_of_its: 512
+            elx_no_of_resolutions = 4
+            elx_max_number_of_its = 512
             if param_initialize_offset_method in ['init_elx', 'init_xcorr']:
-                elx_no_of_resolutions: 2
-                elx_max_number_of_its: 256
+                elx_no_of_resolutions = 2
+                elx_max_number_of_its = 256
             if not any(item.startswith('sbs_alignment:elx_number_of_resolutions:') for item in params):
                 params.append(f'sbs_alignment:elx_number_of_resolutions:{elx_no_of_resolutions}')
             if not any(item.startswith('sbs_alignment:elx_maximum_number_of_iterations:') for item in params):
