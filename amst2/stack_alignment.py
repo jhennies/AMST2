@@ -222,7 +222,7 @@ def snk_elastix_stack_alignment():
                         help='Resolution of the dataset, needs to be supplied if not using ome.zarr data')
     parser.add_argument('--unit', type=str, default='micrometers',
                         help='Unit of the resolution; default = "micrometers"')
-    parser.add_argument('--transform', type=str, default='translation',
+    parser.add_argument('--transform', type=str, default=None,
                         help='The transformation that is applied to the images; default="translation"')
     parser.add_argument('--auto_mask', type=str, default='None',
                         help='Automatically generates a mask for fixed and moving image; '
@@ -380,6 +380,9 @@ def snk_elastix_stack_alignment():
     ome_zarr_args['chunk_size'] = chunk_size
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
+
+    if transform is None and elx_microscopy_preset is None:
+        transform = 'translation'
 
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
