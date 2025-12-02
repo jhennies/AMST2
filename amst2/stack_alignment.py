@@ -320,6 +320,7 @@ def snk_elastix_stack_alignment():
     elx_number_of_resolutions = args.elx_number_of_resolutions
     elx_number_of_spatial_samples = args.elx_number_of_spatial_samples
     elx_maximum_number_of_iterations = args.elx_maximum_number_of_iterations
+    elx_microscopy_preset = args.elx_microscopy_preset
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
@@ -411,6 +412,7 @@ def snk_elastix_stack_alignment():
             number_of_resolutions=elx_number_of_resolutions,
             number_of_spatial_samples=elx_number_of_spatial_samples,
             maximum_number_of_iterations=elx_maximum_number_of_iterations,
+            microscopy_preset=elx_microscopy_preset,
             debug=debug
         ),
         **output_location_args,
