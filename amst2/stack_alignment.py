@@ -273,6 +273,12 @@ def snk_elastix_stack_alignment():
                         help='Elastix parameter: Number of spacial samples; Default=2048')
     parser.add_argument('--elx_maximum_number_of_iterations', type=int, default=None,
                         help='Elastix parameter: Maximum number of iterations per resolution level; Default=256')
+    parser.add_argument('--elx_microscopy_preset', type=str, default=None,
+                        help='Loads elastix parameters set for different types of microscopy image data. '
+                             'Currently implemented:\n'
+                             '  None (default): Elastix defaults for respective transform\n'
+                             '  "fibsem": For FIB-SEM datasets\n'
+                             '  "array-tomography": for array tomography datasets\n')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
