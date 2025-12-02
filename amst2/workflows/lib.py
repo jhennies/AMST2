@@ -199,7 +199,7 @@ def run_nsbs_alignment(
     if 'elx_maximum_number_of_iterations' in this_param_dict:
         args.append(f'--elx_maximum_number_of_iterations {this_param_dict["elx_maximum_number_of_iterations"]}')
     if 'elx_microscopy_preset' in this_param_dict:
-        args.append(f'--elx_micrscopy_preset {this_param_dict["elx_microscopy_preset"]}')
+        args.append(f'--elx_microscopy_preset {this_param_dict["elx_microscopy_preset"]}')
     if 'initialize_offsets_method' in this_param_dict:
         args.append(f'--initialize_offsets_method {this_param_dict["initialize_offsets_method"]}')
     if 'initialize_offsets_kwargs' in this_param_dict:
