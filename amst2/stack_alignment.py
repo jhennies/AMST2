@@ -368,8 +368,9 @@ def snk_elastix_stack_alignment():
         unit = get_unit_of_dataset(ome_zarr_h)
     dtype = str(data_h.dtype)
 
-    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] in [2, 4, 8, 16, 32, 64, 128], 'Only allowing batch sizes of [2, 4, 8, 16, 32, 64, 128]!'
     assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
+    assert common_args['batch_size'] > z_step, 'z-step must be larger or equal to batch size'
     chunk_size = [ome_zarr_args['chunk_size']]
     downsample_factors = ome_zarr_args['downsample_factors']
     for ds_factor in downsample_factors:
@@ -563,7 +564,7 @@ def snk_apply_transformation():
     else:
         stack_shape = shape_h
 
-    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] in [2, 4, 8, 16, 32, 64, 128], 'Only allowing batch sizes of [2, 4, 8, 16, 32, 64, 128]!'
     assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
     chunk_size = [ome_zarr_args['chunk_size']]
     downsample_factors = ome_zarr_args['downsample_factors']

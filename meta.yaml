@@ -1,5 +1,5 @@
 {% set name = "amst2" %}
-{% set version = "0.3.12" %}
+{% set version = "0.3.13" %}
 
 package:
   name: "{{ name|lower }}"
@@ -15,14 +15,14 @@ requirements:
     - h5py
     - tifffile
     - ruamel.yaml
-    - squirrel>=0.3.13
+    - squirrel>=0.3.15
   run:
     - python
     - numpy
     - h5py
     - tifffile
     - ruamel.yaml
-    - squirrel>=0.3.13
+    - squirrel>=0.3.15
 
 test:
   imports:
