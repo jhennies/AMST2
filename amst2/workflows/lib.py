@@ -79,11 +79,11 @@ def run_snakemake_workflow(run_script, wf_name):
         #     if process.poll() is not None:
         #         break
 
-        # for line in process.stderr:
+        # for line in iter(process.stderr.readline, ''):  # keeps reading until EOF
         #     stderr_lines.append(line)
-        for line in iter(process.stderr.readline, ''):  # keeps reading until EOF
+        #     line = line.strip()
+        for line in process.stderr:
             stderr_lines.append(line)
-            line = line.strip()
 
             print(f'[STDERR] {line}')
 
