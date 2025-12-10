@@ -43,11 +43,11 @@ def run_snakemake_workflow(run_script, wf_name):
             total_match = re.search(r"total\s+(\d+)", line)
             if total_match:
                 total_steps = int(total_match.group(1))
-            match = re.search(r"(\d+) of (\d+) steps \((\d+)%\) done", line)
+            match = re.search(r"(\d+) of (\d+) steps \((\d+(?:\.\d+)?)%\) done", line)
             if match:
                 current_step = int(match.group(1))
                 total_steps = int(match.group(2))
-                current_progress = int(match.group(3))
+                current_progress = match.group(3)
 
             # Print the updating block
             current_rule_str = f"currently running: {current_rule}\033[K\n" if current_rule != '' else "\033[K\n"
