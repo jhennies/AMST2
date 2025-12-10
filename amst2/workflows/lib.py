@@ -54,7 +54,7 @@ def run_snakemake_workflow(run_script, wf_name):
             print(
                 "\033[F" * 6 +
                 "_____________________________________________\n\n"
-                f"{wf_name} - {current_progress} %\n\n"
+                f"{wf_name} - {current_progress} %\033[K\n\n"
                 f"{current_step} / {total_steps} jobs successful\n" +
                 current_rule_str +
                 "_____________________________________________",
