@@ -222,7 +222,7 @@ def snk_elastix_stack_alignment():
                         help='Resolution of the dataset, needs to be supplied if not using ome.zarr data')
     parser.add_argument('--unit', type=str, default='micrometers',
                         help='Unit of the resolution; default = "micrometers"')
-    parser.add_argument('--transform', type=str, default='translation',
+    parser.add_argument('--transform', type=str, default=None,
                         help='The transformation that is applied to the images; default="translation"')
     parser.add_argument('--auto_mask', type=str, default='None',
                         help='Automatically generates a mask for fixed and moving image; '
@@ -273,6 +273,12 @@ def snk_elastix_stack_alignment():
                         help='Elastix parameter: Number of spacial samples; Default=2048')
     parser.add_argument('--elx_maximum_number_of_iterations', type=int, default=None,
                         help='Elastix parameter: Maximum number of iterations per resolution level; Default=256')
+    parser.add_argument('--elx_microscopy_preset', type=str, default=None,
+                        help='Loads elastix parameters set for different types of microscopy image data. '
+                             'Currently implemented:\n'
+                             '  None (default): Elastix defaults for respective transform\n'
+                             '  "fibsem": For FIB-SEM datasets\n'
+                             '  "array-tomography": for array tomography datasets\n')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -314,6 +320,7 @@ def snk_elastix_stack_alignment():
     elx_number_of_resolutions = args.elx_number_of_resolutions
     elx_number_of_spatial_samples = args.elx_number_of_spatial_samples
     elx_maximum_number_of_iterations = args.elx_maximum_number_of_iterations
+    elx_microscopy_preset = args.elx_microscopy_preset
     preview_downsample_level = args.preview_downsample_level
     mem = args.mem
     runtime = args.runtime
@@ -361,8 +368,9 @@ def snk_elastix_stack_alignment():
         unit = get_unit_of_dataset(ome_zarr_h)
     dtype = str(data_h.dtype)
 
-    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] in [2, 4, 8, 16, 32, 64, 128], 'Only allowing batch sizes of [2, 4, 8, 16, 32, 64, 128]!'
     assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
+    assert common_args['batch_size'] >= z_step, 'z-step must be larger or equal to batch size'
     chunk_size = [ome_zarr_args['chunk_size']]
     downsample_factors = ome_zarr_args['downsample_factors']
     for ds_factor in downsample_factors:
@@ -373,6 +381,9 @@ def snk_elastix_stack_alignment():
     ome_zarr_args['chunk_size'] = chunk_size
 
     src_dirpath = os.path.dirname(os.path.realpath(__file__))
+
+    if transform is None and elx_microscopy_preset is None:
+        transform = 'translation'
 
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
@@ -405,6 +416,7 @@ def snk_elastix_stack_alignment():
             number_of_resolutions=elx_number_of_resolutions,
             number_of_spatial_samples=elx_number_of_spatial_samples,
             maximum_number_of_iterations=elx_maximum_number_of_iterations,
+            microscopy_preset=elx_microscopy_preset,
             debug=debug
         ),
         **output_location_args,
@@ -552,7 +564,7 @@ def snk_apply_transformation():
     else:
         stack_shape = shape_h
 
-    assert common_args['batch_size'] in [4, 8, 16, 32, 64], 'Only allowing batch sizes of [4, 8, 16, 32, 64]!'
+    assert common_args['batch_size'] in [2, 4, 8, 16, 32, 64, 128], 'Only allowing batch sizes of [2, 4, 8, 16, 32, 64, 128]!'
     assert common_args['batch_size'] % ome_zarr_args['chunk_size'][0] == 0
     chunk_size = [ome_zarr_args['chunk_size']]
     downsample_factors = ome_zarr_args['downsample_factors']
