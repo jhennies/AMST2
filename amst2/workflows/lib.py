@@ -5,13 +5,14 @@ import os
 def run_snakemake_workflow(run_script, wf_name):
     import subprocess
     import re
+    os.environ["PYTHONUNBUFFERED"] = "1"
 
     try:
 
         process = subprocess.Popen(
             run_script,
             shell=True,
-            executable="/bin/bash",
+            # executable="/bin/bash",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -34,8 +35,12 @@ def run_snakemake_workflow(run_script, wf_name):
             end=""
         )
 
-        for line in process.stderr:
+        # for line in process.stderr:
+        #     stderr_lines.append(line)
+        for line in iter(process.stderr.readline, ''):  # keeps reading until EOF
             stderr_lines.append(line)
+            line = line.strip()
+
             if line.startswith('localrule '):
                 current_rule = line.split(' ')[1][:-2]
             total_match = re.search(r"total\s+(\d+)", line)
