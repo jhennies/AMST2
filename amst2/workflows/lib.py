@@ -2,7 +2,116 @@
 import os
 
 
-def run_snakemake_workflow(
+def run_snakemake_workflow(run_script, wf_name):
+    import subprocess
+    import re
+
+    try:
+
+        process = subprocess.Popen(
+            run_script,
+            shell=True,
+            executable="/bin/bash",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+        )
+
+        # Collect stderr as we stream it
+        stderr_lines = []
+
+        current_step = 0
+        current_progress = 0
+        total_steps = 0
+        current_rule = ''
+        print(
+            "\n_____________________________________________\n\n"
+            f"{wf_name} - {current_progress} %\n\n"
+            f"{current_step} / {total_steps} jobs successful\n"
+            f"\n"
+            "_____________________________________________",
+            end=""
+        )
+
+        for line in process.stderr:
+            stderr_lines.append(line)
+            if line.startswith('localrule '):
+                current_rule = line.split(' ')[1][:-2]
+            total_match = re.search(r"total\s+(\d+)", line)
+            if total_match:
+                total_steps = int(total_match.group(1))
+            match = re.search(r"(\d+) of (\d+) steps \((\d+)%\) done", line)
+            if match:
+                current_step = int(match.group(1))
+                total_steps = int(match.group(2))
+                current_progress = int(match.group(3))
+
+            # Print the updating block
+            current_rule_str = f"currently running: {current_rule}\033[K\n" if current_rule != '' else "\033[K\n"
+            print(
+                "\033[F" * 6 +
+                "_____________________________________________\n\n"
+                f"{wf_name} - {current_progress} %\n\n"
+                f"{current_step} / {total_steps} jobs successful\n" +
+                current_rule_str +
+                "_____________________________________________",
+                end="",
+                flush=True
+            )
+
+            # print("[LIVE]", line, end="")
+
+        process.wait()
+
+    except subprocess.CalledProcessError as e:
+        print(f"\n\n{e.stderr}\n")
+        print(f"\n{e.stdout}\n")
+        print("_____________________________________________\n")
+        print(f"{wf_name} failed. Check out error message above!")
+        print("_____________________________________________\n")
+        return 1
+    except Exception as e:
+        print(f'\n\n{e}\n')
+        return 1
+
+    # Convert collected lines to a single string
+    stderr_text = "".join(stderr_lines)
+    lines = [line.strip() for line in stderr_text.splitlines() if line.strip()]
+
+    # Check for success marker
+    if any("(100%) done" in line for line in lines[-10:]):
+        print(
+            "\033[F" * 6 +
+            "_____________________________________________\n\n"
+            f"{wf_name} was successful!\033[K\n"
+            "_____________________________________________\033[K\n",
+            "\033[K\n",
+            "\033[K",
+            end='',
+            flush=True
+        )
+        return 0
+    elif lines[-1].split(' ')[0][-6:] == 'Error:':
+        print(f'\n\n{stderr_text}')
+        print("_____________________________________________\n")
+        print(f"{wf_name} failed. See error above.")
+        print("_____________________________________________\n")
+        return 1
+    else:
+        print(f'\n\n{stderr_text}')
+        print("_____________________________________________\n")
+        print(f"{wf_name} failed.")
+        print(
+            "Check out {} for details or check out the output above!".format(
+                lines[-1] if lines else "the logs"
+            )
+        )
+        print("_____________________________________________\n")
+        return 1
+
+
+def run_snakemake_workflow_old(
         run_script, wf_name,
 ):
     import subprocess
@@ -134,7 +243,7 @@ def run_stack_to_ome_zarr(
 
     run_script = f'amst2-stack_to_ome_zarr {" ".join(args)}'
 
-    print(run_script)
+    print(f'\n{run_script}')
 
     error = run_snakemake_workflow(run_script, parameter_key)
 
@@ -232,7 +341,7 @@ def run_nsbs_alignment(
 
     run_script = f'amst2-elastix_stack_alignment {" ".join(args)}'
 
-    print(run_script)
+    print(f'\n{run_script}')
 
     error = run_snakemake_workflow(run_script, parameter_key)
 
@@ -305,7 +414,7 @@ def run_apply_transformation(
 
     run_script = f'amst2-apply_transformation {" ".join(args)}'
 
-    print(run_script)
+    print(f'\n{run_script}')
 
     error = run_snakemake_workflow(run_script, parameter_key)
 
@@ -353,7 +462,7 @@ def run_ome_zarr_to_stack(
         "--continue_run"
     )
 
-    print(run_script)
+    print(f'\n{run_script}')
 
     error = run_snakemake_workflow(run_script, parameter_key)
 
@@ -420,7 +529,7 @@ def run_amst(
         "--continue_run"
     )
 
-    print(run_script)
+    print(f'\n{run_script}')
 
     error = run_snakemake_workflow(run_script, parameter_key)
 
