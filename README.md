@@ -13,30 +13,26 @@ by Simple Elastix functionality.
 
 ## Installation
 
-Clone squirrel and AMST2 repositories:
-```
-cd path/to/src
-git clone https://github.com/jhennies/squirrel
-git clone https://github.com/jhennies/AMST2
-```
+Prerequesite: Install conda on your system, e.g. from https://conda-forge.org/miniforge/
 
-Install the packages:
-```
-cd path/to/src
-mamba create -n amst2-env -c bioconda -c conda-forge python=3.11 snakemake=8.27
+### For local execution
+
+```shell
+conda create -n amst2-0.3.14-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8
 conda activate amst2-env
-pip install -e squirrel
-pip install -e AMST2
-pip install SimpleITK-SimpleElastix
-pip install transforms3d
-mamba install -c conda-forge vigra
-mamba install -c conda-forge opencv
-mamba install -c conda-forge zarr=2
+pip install SimpleITK-SimpleElastix transforms3d ruamel.yaml
+pip install https://github.com/jhennies/squirrel/archive/refs/tags/0.3.15.tar.gz
+pip install https://github.com/jhennies/AMST2/archive/refs/tags/0.3.14.tar.gz
 ```
 
-To use a slurm cluster:
-```
-pip install snakemake-executor-plugin-slurm
+### For slurm cluster execution
+
+```shell
+conda create -n amst2-0.3.14-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8 snakemake-executor-plugin-slurm
+conda activate amst2-env
+pip install SimpleITK-SimpleElastix transforms3d ruamel.yaml
+pip install https://github.com/jhennies/squirrel/archive/refs/tags/0.3.15.tar.gz
+pip install https://github.com/jhennies/AMST2/archive/refs/tags/0.3.14.tar.gz
 ```
 
 ## Usage
