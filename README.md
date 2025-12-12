@@ -39,9 +39,31 @@ pip install https://github.com/jhennies/AMST2/archive/refs/tags/0.3.14.tar.gz
 
 To test the installation, we recommend using this dataset: https://www.ebi.ac.uk/empiar/EMPIAR-10311/
 
-You can select only the first 32 tif slices (slice_0000.tif to slice_0031.tif) for download, in order to generate a suitable test dataset. 
-The examples were tested specifically with this fraction of the dataset, thus this should work properly.
+I have set up a suitable subset of the EMPIAR-10311 dataset on my owncloud which you can test on in a new directory like so:
+
+```shell
+wget https://oc.embl.de/index.php/s/RhlFWP3JGnuoIAM/download
+unzip download
+rm download
+```
+
+Run the test alignment (remove the "--slurm" line if you are running locally):
+
+```shell
+amst2-wf-nsbs_pre_align-get_default_parameter_file \
+  -pi hela-test-dataset/ \
+  -po pre-align \
+  -p general:resolution:[0.008,0.005,0.005] \
+     general:batch_size:8 \
+     general:max_cores_per_task:8 \
+     nsbs_alignment:batch_size:16 \
+     pre_align_to_tif_stack:active:true \
+  --slurm \
+  --estimate_crop_xy
+  
+amst2-wf-nsbs_pre_align-run params_pre_align.yaml
+```
  
-Check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
+Also check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
 
 
