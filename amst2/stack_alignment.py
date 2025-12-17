@@ -496,6 +496,10 @@ def snk_apply_transformation():
                         help='Unit of the resolution; default = "micrometers"')
     parser.add_argument('--no_autopad', action='store_true',
                         help='Switches off auto-padding')
+    parser.add_argument('--resample_interpolator', type=str, default=None,
+                        help='Select the interpolator; Default = None; Examples:\n'
+                             '  "none": evaluates to None -> Default\n'
+                             '  "nearest" / "FinalNearestNeighborInterpolator": nearest interpolation')
     parser.add_argument('--mem', type=str, nargs='+', default=None,
                         help='Cluster job memory amounts for the snakemake rules.\n'
                              'For each rule define like so:\n'
@@ -521,6 +525,9 @@ def snk_apply_transformation():
     stack_pattern = args.stack_pattern
     resolution = args.resolution
     unit = args.unit
+    resample_interpolator = args.resample_interpolator
+    if resample_interpolator == 'none':
+        resample_interpolator = None
 
     common_args = args_to_dict(args, common_arg_fields)
     output_location_args = output_locations_to_dict(
@@ -589,6 +596,7 @@ def snk_apply_transformation():
         resolution=resolution,
         unit=unit,
         no_autopad=no_autopad,
+        resample_interpolator=resample_interpolator,
         **output_location_args,
         **common_args,
         **ome_zarr_args
