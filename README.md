@@ -14,14 +14,14 @@ by Simple Elastix functionality.
 ## Installation
 
 Clone squirrel and AMST2 repositories:
-```
+```shell
 cd path/to/src
 git clone https://github.com/jhennies/squirrel
 git clone https://github.com/jhennies/AMST2
 ```
 
 Install the packages:
-```
+```shell
 cd path/to/src
 mamba create -n amst2-env -c bioconda -c conda-forge python=3.11 snakemake=8.27
 conda activate amst2-env
@@ -35,8 +35,19 @@ mamba install -c conda-forge zarr=2
 ```
 
 To use a slurm cluster:
-```
+```shell
 pip install snakemake-executor-plugin-slurm
+```
+
+## Simplified installation
+
+```shell
+mamba create -n amst2-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8 snakemake-executor-plugin-slurm
+conda activate amst2-env
+pip install SimpleITK-SimpleElastix
+pip install transforms3d
+pip install -e squirrel
+pip install -e AMST2
 ```
 
 ## Usage

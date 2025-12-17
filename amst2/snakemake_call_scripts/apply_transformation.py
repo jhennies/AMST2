@@ -23,6 +23,8 @@ if __name__ == '__main__':
 
     print(f'z_range = {z_range}')
 
+    resample_interpolator = run_info['resample_interpolator'] if 'resample_interpolator' in run_info else None
+
     # from squirrel.library.ome_zarr import get_ome_zarr_handle
     # input_ome_zarr_dataseth = get_ome_zarr_handle(input_ome_zarr_filepath, key='s0', mode='r')
     # stack_shape = input_ome_zarr_dataseth.shape
@@ -95,6 +97,7 @@ if __name__ == '__main__':
         auto_pad=False,
         z_range=z_range,
         start_transform_id=z_range[0],
+        resample_interpolator=resample_interpolator,
         n_workers=n_threads,
         quiet=False,
         verbose=verbose
