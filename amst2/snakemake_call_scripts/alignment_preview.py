@@ -67,7 +67,7 @@ if __name__ == '__main__':
         if transforms.exists_meta('stack_shape'):
             stack_shape = transforms.get_meta('stack_shape')
         else:
-            if input_filetype == 'ome.zarr':
+            if input_filetype == 'ome_zarr':
                 stack_shape = input_fileh[run_info['stack_key']].shape
             else:
                 stack_shape = input_fileh.shape
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     if save_joined_transforms:
         transforms.to_file(transforms_filepath)
 
-    if input_filetype == 'ome.zarr':
+    if input_filetype == 'ome_zarr':
 
         from squirrel.library.ome_zarr import get_scale_of_downsample_level
 
