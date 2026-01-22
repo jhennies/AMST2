@@ -6,8 +6,18 @@ if __name__ == '__main__':
 
     run_info = snakemake.params['run_info']
 
-    from squirrel.library.elastix import load_transform_stack_from_multiple_files
+    if run_info['transform'] in ['bspline', 'BSplineTransform']:
 
-    transforms = load_transform_stack_from_multiple_files(sn_input)
+        from squirrel.library.elastix import load_transform_stack_from_multiple_files
+        transforms = load_transform_stack_from_multiple_files(sn_input)
+        transforms.to_file(sn_output)
 
-    transforms.to_file(sn_output)
+    if run_info['transform'] in ['affine', 'AffineTransform']:
+
+        from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
+        transforms = load_transform_stack_from_multiple_files(sn_input, sequence_stack=False)
+        if not transforms.is_sequenced:
+            transforms = transforms.get_sequenced_stack()
+        transforms.to_file(sn_output)
+
+    raise ValueError(f'Invalid transform: {run_info["transform"]}')

@@ -142,7 +142,8 @@ def snk_amst():
 
     parser, sn_args = parse_args({})
     args_to_snakemake_arguments(args, sn_args, output_location_args=output_location_args)
-    sn_args.snakefile = Path(os.path.join(src_dirpath, f'snakemake_workflows/amst_{transform}.snk'))
+    # sn_args.snakefile = Path(os.path.join(src_dirpath, f'snakemake_workflows/amst_{transform}.snk'))
+    sn_args.snakefile = Path(os.path.join(src_dirpath, f'snakemake_workflows/amst_bspline.snk'))
     sn_args.set_threads = dict(
         amst=min(args.batch_size, args.cores, args.max_cores_per_task)
     )

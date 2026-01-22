@@ -35,7 +35,7 @@ if __name__ == '__main__':
     if verbose:
         print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
         print(f'input_filetype = {input_filetype}')
-    if input_filetype == 'ome.zarr':
+    if input_filetype == 'ome_zarr':
         from squirrel.library.ome_zarr import get_ome_zarr_handle
         input_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
     else:
