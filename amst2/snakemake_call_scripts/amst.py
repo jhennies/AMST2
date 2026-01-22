@@ -21,7 +21,7 @@ if __name__ == '__main__':
     amst_workflow(
         run_info['input_ome_zarr_filepath'],
         output,
-        pre_align_key=run_info['input_key'],
+        pre_align_key=run_info['stack_key'],
         transform=run_info['transform'],
         auto_mask_off=run_info['auto_mask_off'],
         median_radius=run_info['median_radius'],

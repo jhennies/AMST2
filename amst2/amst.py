@@ -112,7 +112,7 @@ def snk_amst():
 
     run_info = dict(
         input_ome_zarr_filepath=input_ome_zarr_filepath,
-        input_key='s0',
+        stack_key='s0',
         transform=transform,
         auto_mask_off=auto_mask_off,
         median_radius=median_radius,
