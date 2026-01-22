@@ -13,50 +13,57 @@ by Simple Elastix functionality.
 
 ## Installation
 
-Clone squirrel and AMST2 repositories:
-```shell
-cd path/to/src
-git clone https://github.com/jhennies/squirrel
-git clone https://github.com/jhennies/AMST2
-```
+Prerequesite: Install conda on your system, e.g. from https://conda-forge.org/miniforge/
 
-Install the packages:
+### For local execution
+
 ```shell
-cd path/to/src
-mamba create -n amst2-env -c bioconda -c conda-forge python=3.11 snakemake=8.27
+conda create -n amst2-0.3.14-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8
 conda activate amst2-env
-pip install -e squirrel
-pip install -e AMST2
-pip install SimpleITK-SimpleElastix
-pip install transforms3d
-mamba install -c conda-forge vigra
-mamba install -c conda-forge opencv
-mamba install -c conda-forge zarr=2
+pip install SimpleITK-SimpleElastix transforms3d ruamel.yaml
+pip install https://github.com/jhennies/squirrel/archive/refs/tags/0.3.15.tar.gz
+pip install https://github.com/jhennies/AMST2/archive/refs/tags/0.3.14.tar.gz
 ```
 
-To use a slurm cluster:
-```shell
-pip install snakemake-executor-plugin-slurm
-```
-
-## Simplified installation
+### For slurm cluster execution
 
 ```shell
-mamba create -n amst2-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8 snakemake-executor-plugin-slurm
+conda create -n amst2-0.3.14-env -c bioconda -c conda-forge --override-channels python=3.11 nibabel napari pyqt opencv zarr=2 vigra pandas snakemake=8 snakemake-executor-plugin-slurm
 conda activate amst2-env
-pip install SimpleITK-SimpleElastix
-pip install transforms3d
-pip install -e squirrel
-pip install -e AMST2
+pip install SimpleITK-SimpleElastix transforms3d ruamel.yaml
+pip install https://github.com/jhennies/squirrel/archive/refs/tags/0.3.15.tar.gz
+pip install https://github.com/jhennies/AMST2/archive/refs/tags/0.3.14.tar.gz
 ```
 
 ## Usage
 
 To test the installation, we recommend using this dataset: https://www.ebi.ac.uk/empiar/EMPIAR-10311/
 
-You can select only the first 32 tif slices (slice_0000.tif to slice_0031.tif) for download, in order to generate a suitable test dataset. 
-The examples were tested specifically with this fraction of the dataset, thus this should work properly.
+I have set up a suitable subset of the EMPIAR-10311 dataset on my owncloud which you can test on in a new directory like so:
+
+```shell
+wget https://oc.embl.de/index.php/s/RhlFWP3JGnuoIAM/download
+unzip download
+rm download
+```
+
+Run the test alignment (remove the "--slurm" line if you are running locally):
+
+```shell
+amst2-wf-nsbs_pre_align-get_default_parameter_file \
+  -pi hela-test-dataset/ \
+  -po pre-align \
+  -p general:resolution:[0.008,0.005,0.005] \
+     general:batch_size:8 \
+     general:max_cores_per_task:8 \
+     nsbs_alignment:batch_size:16 \
+     pre_align_to_tif_stack:active:true \
+  --slurm \
+  --estimate_crop_xy
+  
+amst2-wf-nsbs_pre_align-run params_pre_align.yaml
+```
  
-Check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
+Also check out the most recent example for [pre alignment and AMST](examples/simple_pre_alignment_and_amst.md)
 
 
