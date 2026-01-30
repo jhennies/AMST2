@@ -12,7 +12,7 @@ if __name__ == '__main__':
         transforms = load_transform_stack_from_multiple_files(sn_input)
         transforms.to_file(sn_output)
 
-    if run_info['transform'] in ['affine', 'AffineTransform']:
+    elif run_info['transform'] in ['affine', 'AffineTransform']:
 
         from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
         transforms = load_transform_stack_from_multiple_files(sn_input, sequence_stack=False)
@@ -20,4 +20,5 @@ if __name__ == '__main__':
             transforms = transforms.get_sequenced_stack()
         transforms.to_file(sn_output)
 
-    raise ValueError(f'Invalid transform: {run_info["transform"]}')
+    else:
+        raise ValueError(f'Invalid transform: {run_info["transform"]}')
