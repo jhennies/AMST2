@@ -303,6 +303,8 @@ def run_nsbs_alignment(
         args.append('--average_for_z_step')
     if 'gaussian_sigma' in this_param_dict:
         args.append(f'--gaussian_sigma {this_param_dict["gaussian_sigma"]}')
+    if 'parameter_map' in this_param_dict:
+        args.append(f'--parameter_map {this_param_dict["parameter_map"]}')
     if 'elx_number_of_resolutions' in this_param_dict:
         args.append(f'--elx_number_of_resolutions {this_param_dict["elx_number_of_resolutions"]}')
     if 'elx_number_of_spatial_samples' in this_param_dict:
