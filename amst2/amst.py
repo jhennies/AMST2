@@ -34,6 +34,8 @@ def snk_amst():
                              'values=["median", "gaussian"]')
     parser.add_argument('-gs', '--gaussian_sigma', type=float, default=0.,
                         help='Gaussian smoothing before computing registration')
+    parser.add_argument('-cl', '--use_clahe', action='store_true',
+                        help='Runs a CLAHE filter before computing registration')
     parser.add_argument('--elastix_parameter_file', type=str, default=None,
                         help='Optionally, supply a parameter file for the registration step; default=None')
     parser.add_argument('--no_previews', action='store_true',
@@ -62,6 +64,7 @@ def snk_amst():
     median_radius = args.median_radius
     z_smooth_method = args.z_smooth_method
     gaussian_sigma = args.gaussian_sigma
+    use_clahe = args.use_clahe
     elastix_parameter_file = os.path.abspath(args.elastix_parameter_file) if args.elastix_parameter_file is not None else None
     no_previews = args.no_previews
     preview_downsample_level = args.preview_downsample_level
@@ -118,6 +121,7 @@ def snk_amst():
         median_radius=median_radius,
         z_smooth_method=z_smooth_method,
         gaussian_sigma=gaussian_sigma,
+        use_clahe=use_clahe,
         elastix_parameter_file=elastix_parameter_file,
         no_previews=no_previews,
         batch_ids=batch_ids,

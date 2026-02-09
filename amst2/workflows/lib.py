@@ -521,6 +521,7 @@ def run_amst(
         f"-mr {this_param_dict['median_radius']} "
         f"{'-zm {}'.format(this_param_dict['z_smooth_method']) if 'z_smooth_method' in this_param_dict else ''} "
         f"-gs {this_param_dict['gaussian_sigma']} "
+        f"{'--use_clahe' if 'use_clahe' in this_param_dict and this_param_dict['use_clahe'] == 'active' else ''} "
         f"-out-oz-fn amst.ome.zarr "
         f"{'--auto_mask_off' if 'auto_mask_off' in this_param_dict and this_param_dict['auto_mask_off'] else ''} "
         f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "

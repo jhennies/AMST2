@@ -27,6 +27,7 @@ if __name__ == '__main__':
         median_radius=run_info['median_radius'],
         z_smooth_method=run_info['z_smooth_method'],
         gaussian_sigma=run_info['gaussian_sigma'],
+        use_clahe=run_info['use_clahe'],
         elastix_parameters=run_info['elastix_parameter_file'],
         z_range=z_range,
         quiet=False,
