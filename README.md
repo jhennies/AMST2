@@ -13,6 +13,8 @@ by Simple Elastix functionality.
 
 ## Installation
 
+The code was developed in Linux. The snakemake-based workflow can cause issues when working in Windows, we recommend using WSL.
+
 Prerequesite: Install conda on your system, e.g. from https://conda-forge.org/miniforge/
 
 ### For local execution
