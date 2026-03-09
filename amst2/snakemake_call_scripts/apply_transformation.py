@@ -100,6 +100,7 @@ if __name__ == '__main__':
         resample_interpolator=resample_interpolator,
         n_workers=n_threads,
         quiet=False,
+        assert_sequenced=True,
         verbose=verbose
     )
 
