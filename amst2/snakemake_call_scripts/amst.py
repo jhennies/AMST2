@@ -28,6 +28,7 @@ if __name__ == '__main__':
         z_smooth_method=run_info['z_smooth_method'],
         gaussian_sigma=run_info['gaussian_sigma'],
         use_clahe=run_info['use_clahe'],
+        use_edges=run_info['use_edges'],
         elastix_parameters=run_info['elastix_parameter_file'],
         z_range=z_range,
         quiet=False,
