@@ -257,7 +257,8 @@ def run_nsbs_alignment(
         parameter_dict,
         parameter_key,
         input_dirpath=None,
-        verbose=False
+        verbose=False,
+        debug=False
 ):
 
     this_param_dict = get_parameters_for_snakemake_workflow(parameter_dict, parameter_key, verbose=verbose)
@@ -303,6 +304,10 @@ def run_nsbs_alignment(
         args.append('--average_for_z_step')
     if 'gaussian_sigma' in this_param_dict:
         args.append(f'--gaussian_sigma {this_param_dict["gaussian_sigma"]}')
+    if 'use_clahe' in this_param_dict and this_param_dict["use_clahe"] == 'active':
+        args.append(f'--use_clahe')
+    if 'parameter_map' in this_param_dict:
+        args.append(f'--parameter_map {this_param_dict["parameter_map"]}')
     if 'elx_number_of_resolutions' in this_param_dict:
         args.append(f'--elx_number_of_resolutions {this_param_dict["elx_number_of_resolutions"]}')
     if 'elx_number_of_spatial_samples' in this_param_dict:
@@ -317,6 +322,8 @@ def run_nsbs_alignment(
         args.append(f'--initialize_offsets_kwargs {init_offsets_kwargs_str}')
     if 'apply_final' in this_param_dict and this_param_dict['apply_final']:
         args.append('--apply_final')
+    if 'use_edges' in this_param_dict and this_param_dict['use_edges']:
+        args.append('--use_edges')
     if 'auto_mask' in this_param_dict:
         args.append(f'--auto_mask {this_param_dict["auto_mask"]}')
     args.append(f'--downsample_type {this_param_dict["downsample_type"] if "downsample_type" in this_param_dict else "Sample"}')
@@ -337,6 +344,8 @@ def run_nsbs_alignment(
         args.append(f'--mem {mem_str}')
     if 'runtime' in this_param_dict:
         args.append(f'--runtime {runtime_str}')
+    if debug:
+        args.append('--debug')
     if verbose:
         args.append('-v')
     args.append('--continue_run')
@@ -519,6 +528,7 @@ def run_amst(
         f"-mr {this_param_dict['median_radius']} "
         f"{'-zm {}'.format(this_param_dict['z_smooth_method']) if 'z_smooth_method' in this_param_dict else ''} "
         f"-gs {this_param_dict['gaussian_sigma']} "
+        f"{'--use_clahe' if 'use_clahe' in this_param_dict and this_param_dict['use_clahe'] == 'active' else ''} "
         f"-out-oz-fn amst.ome.zarr "
         f"{'--auto_mask_off' if 'auto_mask_off' in this_param_dict and this_param_dict['auto_mask_off'] else ''} "
         f"{'--cluster slurm' if 'cluster' in this_param_dict and this_param_dict['cluster'] == 'slurm' else ''} "

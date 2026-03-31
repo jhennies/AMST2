@@ -21,6 +21,10 @@ def _run_amst(parameter_yaml, verbose=False):
         parameter_dict['general']['resolution'] = resolution
         parameter_dict['general']['unit'] = unit
 
+    amst_transforms_filename = 'amst'
+    if parameter_dict['amst']['transform'] in ['affine', 'AffineTransform']:
+        amst_transforms_filename = 'amst.json'
+
     from .lib import run_amst
 
     run_amst(
@@ -45,7 +49,7 @@ def _run_amst(parameter_yaml, verbose=False):
         parameter_key=apply_amst_param_key,
         transforms_filepath=[
             pre_align_transforms,
-            os.path.join(output_dirpath, 'amst', 'amst.meta', 'amst')
+            os.path.join(output_dirpath, 'amst', 'amst.meta', amst_transforms_filename)
         ],
         input_dirpath=input_dirpath,
         output_filename='amst.ome.zarr',
@@ -241,8 +245,10 @@ def get_default_parameter_file():
             param_input_dirpath = os.path.join(pre_align_output_dirpath, 'stack_to_ome_zarr', 'input-raw.ome.zarr') if param_input_dirpath is None else param_input_dirpath
         else:
             param_input_dirpath = pre_align_dict['general']['input_dirpath'] if param_input_dirpath is None else param_input_dirpath
-        param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr') if param_pre_align_dirpath is None else param_pre_align_dirpath
-        param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json') if param_pre_align_transforms is None else param_pre_align_transforms
+        if param_pre_align_dirpath is None:
+            param_pre_align_dirpath = os.path.join(pre_align_output_dirpath, 'apply_pre_align', 'nsbs-pre-align.ome.zarr') if param_pre_align_dirpath is None else param_pre_align_dirpath
+        if param_pre_align_transforms is None:
+            param_pre_align_transforms = os.path.join(pre_align_output_dirpath, 'nsbs-pre-align.json') if param_pre_align_transforms is None else param_pre_align_transforms
         if 'stack_key' in pre_align_dict['general']:
             if params is None:
                 params = []
