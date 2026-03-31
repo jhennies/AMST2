@@ -31,7 +31,7 @@ def snk_amst():
                         help='Size of median filter for z-median-smoothing step; default=7')
     parser.add_argument('-zm', '--z_smooth_method', type=str, default='median',
                         help='Method used for z-smoothing to generate the template; default="median"; '
-                             'values=["median", "gaussian"]')
+                             'values=["median", "gaussian", "mean", "median_non_zero"]')
     parser.add_argument('-gs', '--gaussian_sigma', type=float, default=0.,
                         help='Gaussian smoothing before computing registration')
     parser.add_argument('-cl', '--use_clahe', action='store_true',
