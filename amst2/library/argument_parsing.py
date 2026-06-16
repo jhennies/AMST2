@@ -11,6 +11,8 @@ def add_common_arguments_to_parser(parser):
                         help='Needed to continue a run')
     parser.add_argument('--cluster', type=str, default=None,
                         help='Use "--cluster slurm" to run on a slurm cluster (only tested on EMBL resources)')
+    parser.add_argument('--group_name', type=str, default=None,
+                        help='Name of the group to which the jobs should be submitted on the cluster; only used if --cluster is set')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     return ['cores', 'max_cores_per_task', 'batch_size', 'continue_run', 'cluster', 'verbose']

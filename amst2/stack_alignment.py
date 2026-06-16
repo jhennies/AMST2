@@ -188,7 +188,7 @@ def snk_default_amst_pre_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -462,7 +462,7 @@ def snk_elastix_stack_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -637,7 +637,7 @@ def snk_apply_transformation():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -814,7 +814,7 @@ def snk_template_matching_stack_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
