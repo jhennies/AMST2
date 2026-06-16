@@ -239,6 +239,8 @@ def run_stack_to_ome_zarr(
         args.append(f'--mem {mem_str}')
     if 'runtime' in this_param_dict:
         args.append(f'--runtime {runtime_str}')
+    if 'group_name' in this_param_dict:
+        args.append(f'--group_name {this_param_dict["group_name"]}')
     if verbose:
         args.append('-v')
     args.append('--continue_run')
@@ -344,6 +346,8 @@ def run_nsbs_alignment(
         args.append(f'--mem {mem_str}')
     if 'runtime' in this_param_dict:
         args.append(f'--runtime {runtime_str}')
+    if 'group_name' in this_param_dict:
+        args.append(f'--group_name {this_param_dict["group_name"]}')
     if debug:
         args.append('--debug')
     if verbose:
@@ -418,6 +422,8 @@ def run_apply_transformation(
         args.append(f'--mem {mem_str}')
     if 'runtime' in this_param_dict:
         args.append(f'--runtime {runtime_str}')
+    if 'group_name' in this_param_dict:
+        args.append(f'--group_name {this_param_dict["group_name"]}')
     if verbose:
         args.append('-v')
     args.append('--no_autopad')
@@ -469,6 +475,7 @@ def run_ome_zarr_to_stack(
         f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
         f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
         f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
+        f"{'--group_name {}'.format(this_param_dict['group_name']) if 'group_name' in this_param_dict else ''} "
         f"{'-v' if verbose else ''} "
         "--continue_run"
     )
@@ -537,6 +544,7 @@ def run_amst(
         f"--max_cores_per_task {this_param_dict['max_cores_per_task'] if 'max_cores_per_task' in this_param_dict else this_param_dict['batch_size'] if 'batch_size' in this_param_dict else min(this_param_dict['cores'], 32)} "
         f"{'--mem {}'.format(mem_str) if 'mem' in this_param_dict else ''} "
         f"{'--runtime {}'.format(runtime_str) if 'runtime' in this_param_dict else ''} "
+        f"{'--group_name {}'.format(this_param_dict['group_name']) if 'group_name' in this_param_dict else ''} "
         f"{'-v' if verbose else ''} "
         "--continue_run"
     )
