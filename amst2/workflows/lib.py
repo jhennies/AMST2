@@ -322,6 +322,8 @@ def run_nsbs_alignment(
         args.append(f'--initialize_offsets_method {this_param_dict["initialize_offsets_method"]}')
     if 'initialize_offsets_kwargs' in this_param_dict:
         args.append(f'--initialize_offsets_kwargs {init_offsets_kwargs_str}')
+    if 'max_offset_distance' in this_param_dict:
+        args.append(f'--max_offset_distance {this_param_dict["max_offset_distance"]}')
     if 'apply_final' in this_param_dict and this_param_dict['apply_final']:
         args.append('--apply_final')
     if 'use_edges' in this_param_dict and this_param_dict['use_edges']:
