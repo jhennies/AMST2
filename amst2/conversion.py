@@ -128,7 +128,7 @@ def snk_stack_to_ome_zarr():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -244,7 +244,7 @@ def snk_ome_zarr_to_stack():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 

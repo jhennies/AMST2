@@ -188,7 +188,7 @@ def snk_default_amst_pre_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -267,6 +267,8 @@ def snk_elastix_stack_alignment():
                              '          elx_binning:4\n'
                              '          elx_max_iters:32\n'
                              '          mi_thresh:-0.8')
+    parser.add_argument('--max_offset_distance', type=float, default=None,
+                        help='Maximum allowed offset distance for the final transforms, anything larger will be set to zero; Default=None')
     parser.add_argument('--parameter_map', type=str, default=None,
                         help='Elastix parameter map file; Overwrites any settings of the elx-parameters below')
     parser.add_argument('--elx_number_of_resolutions', type=int, default=None,
@@ -319,6 +321,7 @@ def snk_elastix_stack_alignment():
     no_preview = args.no_preview
     initialize_offsets_method = args.initialize_offsets_method
     initialize_offsets_kwargs = args.initialize_offsets_kwargs
+    max_offset_distance = args.max_offset_distance
     parameter_map = os.path.abspath(args.parameter_map) if args.parameter_map is not None else None
     elx_number_of_resolutions = args.elx_number_of_resolutions
     elx_number_of_spatial_samples = args.elx_number_of_spatial_samples
@@ -421,6 +424,7 @@ def snk_elastix_stack_alignment():
             number_of_spatial_samples=elx_number_of_spatial_samples,
             maximum_number_of_iterations=elx_maximum_number_of_iterations,
             microscopy_preset=elx_microscopy_preset,
+            max_offset_distance=max_offset_distance,
             debug=debug
         ),
         **output_location_args,
@@ -462,7 +466,7 @@ def snk_elastix_stack_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -637,7 +641,7 @@ def snk_apply_transformation():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 
@@ -814,7 +818,7 @@ def snk_template_matching_stack_alignment():
             runtime_args=runtime
         )
 
-        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'))
+        sn_args = get_cluster_settings(sn_args, os.path.join(src_dirpath, 'cluster', 'embl.json'), group_name=common_args['group_name'])
 
     args_to_api(sn_args, parser)
 

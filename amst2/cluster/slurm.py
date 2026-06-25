@@ -1,5 +1,5 @@
 
-def get_cluster_settings(sn_args, config_filepath):
+def get_cluster_settings(sn_args, config_filepath, group_name=None):
 
     # import json
     # with open(config_filepath, mode='r') as f:
@@ -7,7 +7,8 @@ def get_cluster_settings(sn_args, config_filepath):
 
     import grp
     import os
-    group_name = grp.getgrgid(os.getgid()).gr_name
+    if group_name is None:
+        group_name = grp.getgrgid(os.getgid()).gr_name
 
     sn_args.executor = 'slurm'  # config['executor']
 
