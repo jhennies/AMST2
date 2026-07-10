@@ -1,7 +1,7 @@
 import os
 
 
-def _run_nsbs_pre_align(parameter_yaml, verbose=False):
+def _run_nsbs_pre_align(parameter_yaml, dryrun=False, verbose=False):
 
     from .lib import load_parameter_yaml
     parameter_dict = load_parameter_yaml(parameter_yaml)
@@ -10,14 +10,14 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
 
     output_dirpath = parameter_dict['general']['output_dirpath']
 
-    if not os.path.exists(output_dirpath):
+    if not dryrun and not os.path.exists(output_dirpath):
         os.makedirs(output_dirpath, exist_ok=True)
 
     if 'stack_to_ome_zarr' in parameter_dict and parameter_dict['stack_to_ome_zarr']['active']:
         from .lib import run_stack_to_ome_zarr
-        run_stack_to_ome_zarr(parameter_dict, parameter_key='stack_to_ome_zarr', verbose=verbose)
+        run_stack_to_ome_zarr(parameter_dict, parameter_key='stack_to_ome_zarr', dryrun=dryrun, verbose=verbose)
         input_dirpath = os.path.join(output_dirpath, 'stack_to_ome_zarr/input-raw.ome.zarr')
-        if not os.path.exists(os.path.join(output_dirpath, 'stack_to_ome_zarr', 'stack_to_ome_zarr.done')):
+        if not dryrun and not os.path.exists(os.path.join(output_dirpath, 'stack_to_ome_zarr', 'stack_to_ome_zarr.done')):
             return
         parameter_dict['general']['stack_key'] = 's0'
     else:
@@ -28,10 +28,11 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     run_nsbs_alignment(
         parameter_dict, parameter_key='sbs_alignment',
         input_dirpath=input_dirpath,
+        dryrun=dryrun,
         verbose=verbose
     )
 
-    if not os.path.exists(os.path.join(output_dirpath, 'sbs_alignment', 'sbs_alignment.done')):
+    if not dryrun and not os.path.exists(os.path.join(output_dirpath, 'sbs_alignment', 'sbs_alignment.done')):
         return
 
     parameter_dict['nsbs_alignment']['stack_key'] = 's0'
@@ -39,38 +40,73 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
     run_nsbs_alignment(
         parameter_dict, parameter_key='nsbs_alignment',
         input_dirpath=os.path.join(output_dirpath, 'sbs_alignment/sbs.ome.zarr'),
+        dryrun=dryrun,
         verbose=verbose
     )
 
-    if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment', 'nsbs_alignment.done')):
+    if not dryrun and not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment', 'nsbs_alignment.done')):
         return
+    
+    if not dryrun:
 
-    from squirrel.workflows.transformation import dot_product_on_affines_workflow
-    dot_product_on_affines_workflow(
-        [
-            os.path.join(output_dirpath, 'sbs_alignment/sbs.meta/elastix.json'),
-            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/elastix.json')
-        ],
-        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
-        keep_meta=0,
-        verbose=verbose
-    )
-    if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json')):
-        return
-    if parameter_dict['general']['auto_pad']:
-        from squirrel.workflows.transformation import apply_auto_pad_workflow
-        apply_auto_pad_workflow(
+        from squirrel.workflows.transformation import dot_product_on_affines_workflow
+        dot_product_on_affines_workflow(
+            [
+                os.path.join(output_dirpath, 'sbs_alignment/sbs.meta/elastix.json'),
+                os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/elastix.json')
+            ],
             os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
-            os.path.join(output_dirpath, 'nsbs-pre-align.json'),
+            keep_meta=0,
             verbose=verbose
         )
+        if not os.path.exists(os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json')):
+            return
+        
+        if parameter_dict['general']['auto_pad']:
+            from squirrel.workflows.transformation import apply_auto_pad_workflow
+            apply_auto_pad_workflow(
+                os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
+                os.path.join(output_dirpath, 'nsbs-pre-align.json'),
+                verbose=verbose
+            )
+        else:
+            import shutil
+            shutil.copy(
+                os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
+                os.path.join(output_dirpath, 'nsbs-pre-align.json')
+            )   
+
     else:
-        import shutil
-        shutil.copy(
-            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),
-            os.path.join(output_dirpath, 'nsbs-pre-align.json')
+        print(
+            '\nRunning in python:\n'
+            '```\n'
+            'from squirrel.workflows.transformation import dot_product_on_affines_workflow\n'
+            '    dot_product_on_affines_workflow(\n'
+            '        [\n'
+            "            os.path.join(output_dirpath, 'sbs_alignment/sbs.meta/elastix.json'),\n"
+            "            os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/elastix.json')\n"
+            '        ],\n'
+            "        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),\n"
+            '        keep_meta=0,\n'
+            '        verbose=verbose\n'
+            ')\n\n'
+            "if parameter_dict['general']['auto_pad']:\n"
+            "    from squirrel.workflows.transformation import apply_auto_pad_workflow\n"
+            "    apply_auto_pad_workflow(\n"
+            "        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),\n"
+            "        os.path.join(output_dirpath, 'nsbs-pre-align.json'),\n"
+            "        verbose=verbose\n"
+            "    )\n"
+            "else:\n"
+            "    import shutil\n"
+            "    shutil.copy(\n"
+            "        os.path.join(output_dirpath, 'nsbs_alignment/nsbs.meta/combined.json'),\n"
+            "        os.path.join(output_dirpath, 'nsbs-pre-align.json')\n"
+            "    )               \n"
+            '```'
         )
-    if not os.path.exists(os.path.join(output_dirpath, 'nsbs-pre-align.json')):
+
+    if not dryrun and not os.path.exists(os.path.join(output_dirpath, 'nsbs-pre-align.json')):
         return
 
     from .lib import run_apply_transformation
@@ -80,10 +116,11 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
         transforms_filepath=os.path.join(output_dirpath, 'nsbs-pre-align.json'),
         input_dirpath=input_dirpath,
         output_filename='nsbs-pre-align.ome.zarr',
+        dryrun=dryrun,
         verbose=verbose
     )
 
-    if not os.path.exists(os.path.join(output_dirpath, 'apply_pre_align', 'apply_pre_align.done')):
+    if not dryrun and not os.path.exists(os.path.join(output_dirpath, 'apply_pre_align', 'apply_pre_align.done')):
         return
 
     if 'pre_align_to_tif_stack' in parameter_dict and parameter_dict['pre_align_to_tif_stack']['active']:
@@ -93,8 +130,12 @@ def _run_nsbs_pre_align(parameter_yaml, verbose=False):
             parameter_key='pre_align_to_tif_stack',
             input_dirpath=os.path.join(output_dirpath, 'apply_pre_align/nsbs-pre-align.ome.zarr'),
             output_dirname='nsbs-pre-align',
+            dryrun=dryrun,
             verbose=verbose
         )
+
+    if dryrun:
+        print('')
 
 
 def nsbs_pre_align():
@@ -108,18 +149,23 @@ def nsbs_pre_align():
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('parameter_yaml', type=str)
+    parser.add_argument('parameter_yaml', type=str,
+                        help='Parameter file. Run `amst2-wf-nsbs_pre_align-get_default_parameter_file` to generate it.')
+    parser.add_argument('-d', '--dryrun', action='store_true',
+                        help='Dry-run: Displays the amst2 commands that would be run.')
     parser.add_argument('-v', '--verbose', action='store_true')
 
     args = parser.parse_args()
 
     parameter_yaml = args.parameter_yaml
+    dryrun = args.dryrun
     verbose = args.verbose
 
     if verbose:
         print(f'parameter_yaml = {parameter_yaml}')
+        print(f'dryrun = {dryrun}')
 
-    _run_nsbs_pre_align(parameter_yaml, verbose=verbose)
+    _run_nsbs_pre_align(parameter_yaml, dryrun=dryrun, verbose=verbose)
 
 
 def _run_cleanup_nsbs_pre_align(parameter_yaml, verbose=False, dryrun=False):
