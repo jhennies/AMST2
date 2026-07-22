@@ -88,8 +88,8 @@ if __name__ == '__main__':
 
     if input_filetype == 'ome_zarr':
 
-        scale_full = oz.get_scale(0)
-        scale_ds = oz.get_scale(preview_downsample_level)
+        scale_full = oz.metadata.scale(0)
+        scale_ds = oz.metadata.scale(preview_downsample_level)
         scale = (np.array(scale_ds) / np.array(scale_full)).astype(int)
         assert scale[0] == scale[1] == scale[2], 'Implemented only for isotropic scaling!'
         scale = 1 / scale[0]

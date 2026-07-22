@@ -95,10 +95,10 @@ def snk_amst():
 
     from squirrel.library.ome_zarr import OMEZarrStore
     store = OMEZarrStore(input_ome_zarr_filepath, mode='r')
-    resolution = store.get_scale(0)
-    dtype = np.dtype(store.get_dtype(0)).name
+    resolution = store.metadata.scale(0)
+    dtype = np.dtype(store.dtype(0)).name
     shape = store.shape(0)
-    unit = store.get_unit()
+    unit = store.metadata.units
 
     batch_ids = [x for x in range(0, shape[0], common_args['batch_size'])]
 
