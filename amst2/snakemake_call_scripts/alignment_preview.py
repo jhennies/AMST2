@@ -35,9 +35,11 @@ if __name__ == '__main__':
     if verbose:
         print(f'input_ome_zarr_filepath = {input_ome_zarr_filepath}')
         print(f'input_filetype = {input_filetype}')
+    oz = None
     if input_filetype == 'ome_zarr':
-        from squirrel.library.ome_zarr import get_ome_zarr_handle
-        input_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
+        from squirrel.library.ome_zarr import OMEZarrStore
+        oz = OMEZarrStore(input_ome_zarr_filepath, mode='r')
+        input_fileh = oz.root
     else:
         from squirrel.library.io import load_data_handle
         input_fileh, _ = load_data_handle(input_ome_zarr_filepath, key=run_info['stack_key'], pattern=run_info['stack_pattern'])
@@ -86,10 +88,8 @@ if __name__ == '__main__':
 
     if input_filetype == 'ome_zarr':
 
-        from squirrel.library.ome_zarr import get_scale_of_downsample_level
-
-        scale_full = get_scale_of_downsample_level(input_fileh, 0)
-        scale_ds = get_scale_of_downsample_level(input_fileh, preview_downsample_level)
+        scale_full = oz.get_scale(0)
+        scale_ds = oz.get_scale(preview_downsample_level)
         scale = (np.array(scale_ds) / np.array(scale_full)).astype(int)
         assert scale[0] == scale[1] == scale[2], 'Implemented only for isotropic scaling!'
         scale = 1 / scale[0]

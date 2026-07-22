@@ -195,16 +195,17 @@ def get_resource_str(parameter_dict, resource_name='mem'):
 def run_stack_to_ome_zarr(
         parameter_dict,
         parameter_key='stack_to_ome_zarr',
+        dryrun=False,
         verbose=False
 ):
 
     this_param_dict = get_parameters_for_snakemake_workflow(parameter_dict, parameter_key)
     output_dirpath = os.path.join(this_param_dict['output_dirpath'], parameter_key)
-    if not os.path.exists(output_dirpath):
+    if not dryrun and not os.path.exists(output_dirpath):
         os.mkdir(output_dirpath)
 
     done_fp = os.path.join(output_dirpath, f'{parameter_key}.done')
-    if os.path.exists(done_fp):
+    if not dryrun and os.path.exists(done_fp):
         print('_____________________________________________\n')
         print(f'{parameter_key} already computed!')
         print('_____________________________________________\n')
@@ -249,16 +250,18 @@ def run_stack_to_ome_zarr(
 
     print(f'\n{run_script}')
 
-    error = run_snakemake_workflow(run_script, parameter_key)
+    if not dryrun:
+        error = run_snakemake_workflow(run_script, parameter_key)
 
-    if not error:
-        open(done_fp, 'w').close()
+        if not error:
+            open(done_fp, 'w').close()
 
 
 def run_nsbs_alignment(
         parameter_dict,
         parameter_key,
         input_dirpath=None,
+        dryrun=False,
         verbose=False,
         debug=False
 ):
@@ -269,11 +272,11 @@ def run_nsbs_alignment(
         print(f'parameter_dict = {parameter_dict}')
         print(f'this_param_dict = {this_param_dict}')
     output_dirpath = os.path.join(this_param_dict['output_dirpath'], parameter_key)
-    if not os.path.exists(output_dirpath):
+    if not dryrun and not os.path.exists(output_dirpath):
         os.mkdir(output_dirpath)
 
     done_fp = os.path.join(output_dirpath, f'{parameter_key}.done')
-    if os.path.exists(done_fp):
+    if not dryrun and os.path.exists(done_fp):
         print('_____________________________________________\n')
         print(f'{parameter_key} already computed!')
         print('_____________________________________________\n')
@@ -360,10 +363,11 @@ def run_nsbs_alignment(
 
     print(f'\n{run_script}')
 
-    error = run_snakemake_workflow(run_script, parameter_key)
+    if not dryrun:
+        error = run_snakemake_workflow(run_script, parameter_key)
 
-    if not error:
-        open(done_fp, 'w').close()
+        if not error:
+            open(done_fp, 'w').close()
 
 
 def run_apply_transformation(
@@ -372,15 +376,16 @@ def run_apply_transformation(
         transforms_filepath,
         input_dirpath=None,
         output_filename=None,
+        dryrun=False,
         verbose=False
 ):
     this_param_dict = get_parameters_for_snakemake_workflow(parameter_dict, parameter_key, verbose=verbose)
     output_dirpath = os.path.join(this_param_dict['output_dirpath'], parameter_key)
-    if not os.path.exists(output_dirpath):
+    if not dryrun and not os.path.exists(output_dirpath):
         os.mkdir(output_dirpath)
 
     done_fp = os.path.join(output_dirpath, f'{parameter_key}.done')
-    if os.path.exists(done_fp):
+    if not dryrun and os.path.exists(done_fp):
         print('_____________________________________________\n')
         print(f'{parameter_key} already computed!')
         print('_____________________________________________\n')
@@ -435,10 +440,12 @@ def run_apply_transformation(
 
     print(f'\n{run_script}')
 
-    error = run_snakemake_workflow(run_script, parameter_key)
+    if not dryrun:
 
-    if not error:
-        open(done_fp, 'w').close()
+        error = run_snakemake_workflow(run_script, parameter_key)
+
+        if not error:
+            open(done_fp, 'w').close()
 
 
 def run_ome_zarr_to_stack(
@@ -446,15 +453,16 @@ def run_ome_zarr_to_stack(
         parameter_key,
         input_dirpath=None,
         output_dirname=None,
+        dryrun=False,
         verbose=False
 ):
     this_param_dict = get_parameters_for_snakemake_workflow(parameter_dict, parameter_key, verbose=verbose)
     output_dirpath = os.path.join(this_param_dict['output_dirpath'], parameter_key)
-    if not os.path.exists(output_dirpath):
+    if not dryrun and not os.path.exists(output_dirpath):
         os.mkdir(output_dirpath)
 
     done_fp = os.path.join(output_dirpath, f'{parameter_key}.done')
-    if os.path.exists(done_fp):
+    if not dryrun and os.path.exists(done_fp):
         print('_____________________________________________\n')
         print(f'{parameter_key} already computed!')
         print('_____________________________________________\n')
@@ -484,10 +492,11 @@ def run_ome_zarr_to_stack(
 
     print(f'\n{run_script}')
 
-    error = run_snakemake_workflow(run_script, parameter_key)
+    if not dryrun:
+        error = run_snakemake_workflow(run_script, parameter_key)
 
-    if not error:
-        open(done_fp, 'w').close()
+        if not error:
+            open(done_fp, 'w').close()
 
 
 def run_amst(

@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 if __name__ == '__main__':
 
@@ -11,7 +12,7 @@ if __name__ == '__main__':
     downsample_type = params['downsample_type']
     downsample_factors = params['downsample_factors']
     chunk_size = params['chunk_size']
-    dtype = params['dtype']
+    dtype = np.dtype(params['dtype']).name
     name = params['name']
     n_threads = snakemake.threads
 
@@ -27,16 +28,18 @@ if __name__ == '__main__':
             stack_shape = stack_shape[item]
         print(f'stack_shape = {stack_shape}')
 
-    from squirrel.library.ome_zarr import create_ome_zarr
-
-    create_ome_zarr(
-        output_ome_zarr_filepath,
+    from squirrel.library.ome_zarr import OMEZarrStore
+    OMEZarrStore.create(
+        path=output_ome_zarr_filepath,
         shape=stack_shape,
+        dtype=dtype,
+        chunks=chunk_size,
+        shards=None,
+        downsample_factors=downsample_factors,
         resolution=resolution,
         unit=unit,
-        downsample_type=downsample_type,
-        downsample_factors=downsample_factors,
-        chunk_size=chunk_size,
-        dtype=dtype,
-        name=name,
+        downsample_method=downsample_type,
+        ome_version='0.4',
+        zarr_format=2,
+        overwrite=False
     )
