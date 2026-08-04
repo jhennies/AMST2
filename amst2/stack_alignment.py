@@ -571,9 +571,9 @@ def snk_apply_transformation():
                 shapes.append(this_stack.image_shape())
         else:
             from squirrel.library.affine_matrices import AffineStack
-            this_stack = AffineStack(filepath=input_transforms_filepath)
-            if this_stack.exists_meta('stack_shape') and this_stack.get_meta('stack_shape') is not None:
-                shapes.append(this_stack.get_meta('stack_shape')[1:])
+            this_stack = AffineStack.read(input_transforms_filepath)
+            if this_stack.has_metadata('stack_shape') and this_stack.get_metadata('stack_shape') is not None:
+                shapes.append(this_stack.get_metadata('stack_shape')[1:])
     if len(shapes) > 0:
         import numpy as np
         shapes = np.array(shapes)

@@ -23,11 +23,12 @@ if __name__ == '__main__':
     # Collect the transformations
     import numpy as np
 
-    from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
-    transforms = load_affine_stack_from_multiple_files(input, sequence_stack=False)
-    if not transforms.is_sequenced:
-        transforms = transforms.get_sequenced_stack()
-    print(f'meta = {transforms.get_meta()}')
+    # from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
+    from squirrel.library.affine_matrices import AffineStack
+    transforms = AffineStack.read_many(input, sequence=True)
+    # if not transforms.is_sequenced:
+    #     transforms = transforms.get_sequenced_stack()
+    print(f'meta = {transforms.get_metadata()}')
     print(f'len(transforms) = {len(transforms)}')
 
     from squirrel.library.io import get_filetype
@@ -51,22 +52,25 @@ if __name__ == '__main__':
 
     # if not transforms.is_sequenced:
     #     transforms = transforms.get_sequenced_stack()
-    assert transforms.is_sequenced
+    assert transforms.sequenced
 
     # Perform auto-pad
     stack_shape = None
     if compute_auto_pad:
-        from squirrel.library.image import apply_auto_pad
-        transforms, stack_shape = apply_auto_pad(
-            transforms,
-            [len(transforms), 0., 0.],
-            transforms.get_meta('bounds'),
-            extra_padding=16
-        )
-        transforms.set_meta('stack_shape', stack_shape)
+        transforms, stack_shape = transforms.auto_pad(extra_padding=16)
+        # from squirrel.library.image import apply_auto_pad
+        # transforms, stack_shape = apply_auto_pad(
+        #     transforms,
+        #     [len(transforms), 0., 0.],
+        #     transforms.get_meta('bounds'),
+        #     extra_padding=16
+        # )
+        # transforms.set_meta('stack_shape', stack_shape)
+
+    print(f'transform.get_metadata() = {transforms.get_metadata()}')
 
     if stack_shape is None:
-        if transforms.exists_meta('stack_shape'):
+        if transforms.has_metadata('stack_shape'):
             stack_shape = transforms.get_meta('stack_shape')
         else:
             if input_filetype == 'ome_zarr':
@@ -74,17 +78,17 @@ if __name__ == '__main__':
             else:
                 stack_shape = input_fileh.shape
 
-    if not transforms.exists_meta('stack_shape'):
+    if not transforms.has_metadata('stack_shape'):
         transforms.set_meta('stack_shape', stack_shape)
 
     print(f'len(transforms) = {len(transforms)}')
-    if transforms.exists_meta('z_step'):
+    if transforms.has_metadata('z_step'):
         transforms = transforms.apply_z_step()
     print(f'len(transforms) = {len(transforms)}')
-    print(f'meta = {transforms.get_meta()}')
+    print(f'meta = {transforms.get_metadata()}')
 
     if save_joined_transforms:
-        transforms.to_file(transforms_filepath)
+        transforms.write(transforms_filepath)
 
     if input_filetype == 'ome_zarr':
 
@@ -98,7 +102,7 @@ if __name__ == '__main__':
 
         # Scale the transformations
         stack_shape = (np.array(stack_shape) * scale).astype(int)
-        transforms = transforms.get_scaled(scale)
+        transforms = transforms.scaled_for_stack_resize(scale)
         print(f'stack_shape = {stack_shape}')
         print(f'scale = {scale}')
 
@@ -120,3 +124,4 @@ if __name__ == '__main__':
 
     else:
         open(output, mode='w').close()
+
