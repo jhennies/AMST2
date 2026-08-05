@@ -26,10 +26,6 @@ if __name__ == '__main__':
     # from squirrel.library.affine_matrices import load_affine_stack_from_multiple_files
     from squirrel.library.affine_matrices import AffineStack
     transforms = AffineStack.read_many(input, sequence=True)
-    # if not transforms.is_sequenced:
-    #     transforms = transforms.get_sequenced_stack()
-    print(f'meta = {transforms.get_metadata()}')
-    print(f'len(transforms) = {len(transforms)}')
 
     from squirrel.library.io import get_filetype
     input_filetype = get_filetype(input_ome_zarr_filepath)
@@ -44,30 +40,12 @@ if __name__ == '__main__':
     else:
         from squirrel.library.io import load_data_handle
         input_fileh, _ = load_data_handle(input_ome_zarr_filepath, key=run_info['stack_key'], pattern=run_info['stack_pattern'])
-    # import zarr
-    # try:
-    #     input_ome_zarr_fileh = get_ome_zarr_handle(input_ome_zarr_filepath, mode='r')
-    # except zarr.errors.PathNotFoundError:
-    #     input_ome_zarr_fileh = None
-
-    # if not transforms.is_sequenced:
-    #     transforms = transforms.get_sequenced_stack()
     assert transforms.sequenced
 
     # Perform auto-pad
     stack_shape = None
     if compute_auto_pad:
         transforms, stack_shape = transforms.auto_pad(extra_padding=16)
-        # from squirrel.library.image import apply_auto_pad
-        # transforms, stack_shape = apply_auto_pad(
-        #     transforms,
-        #     [len(transforms), 0., 0.],
-        #     transforms.get_meta('bounds'),
-        #     extra_padding=16
-        # )
-        # transforms.set_meta('stack_shape', stack_shape)
-
-    print(f'transform.get_metadata() = {transforms.get_metadata()}')
 
     if stack_shape is None:
         if transforms.has_metadata('stack_shape'):
@@ -81,11 +59,9 @@ if __name__ == '__main__':
     if not transforms.has_metadata('stack_shape'):
         transforms.set_meta('stack_shape', stack_shape)
 
-    print(f'len(transforms) = {len(transforms)}')
     if transforms.has_metadata('z_step'):
-        transforms = transforms.apply_z_step()
-    print(f'len(transforms) = {len(transforms)}')
-    print(f'meta = {transforms.get_metadata()}')
+        full_stack_shape = run_info['stack_shape']
+        transforms = transforms.apply_z_step(max_length=full_stack_shape[0])
 
     if save_joined_transforms:
         transforms.write(transforms_filepath)
@@ -103,8 +79,6 @@ if __name__ == '__main__':
         # Scale the transformations
         stack_shape = (np.array(stack_shape) * scale).astype(int)
         transforms = transforms.scaled_for_stack_resize(scale)
-        print(f'stack_shape = {stack_shape}')
-        print(f'scale = {scale}')
 
         # Apply the transformations
         from squirrel.library.transformation import apply_stack_alignment
